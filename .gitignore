@@ -1,5 +1,22 @@
-# trivia/.gitignore
+# Python
 venv/
 __pycache__/
+*.pyc
+.pytest_cache/
+
+# Game data (scores and secret bingo codes, changes on every message)
+backend/state.json
+
+# Node / React
 node_modules/
+dist/
+
+# Local settings and secrets
 .env
+.env.local
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
