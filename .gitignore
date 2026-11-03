@@ -1,15 +1,23 @@
 # Python
 venv/
+.venv/
 __pycache__/
 *.pyc
 .pytest_cache/
 
-# Game data (scores and secret bingo codes, changes on every message)
+# Game data (scores, tokens and bingo ticks; changes on every message)
 backend/state.json
 
 # Node / React
 node_modules/
 dist/
+
+# Logs and test screenshots (e2e scripts save v_*.png)
+*.log
+*.png
+!backend/media/*.png
+!guide/*.png
+team-qr.png
 
 # Local settings and secrets
 .env
