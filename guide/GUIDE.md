@@ -237,7 +237,7 @@ After a buzz, the buzzers reopen by themselves after `auto_release_seconds` (def
 
 ## 10. Secret bingo scoring
 
-- Cards are preset in `backend/boards.py`: an id, a title and exactly 16 phrases. **Put your captains' real phrases there.**
+- Cards are preset in `backend/boards.py`: an id, a title and exactly 16 phrases. There are 5 cards, one for each of the 5 team captains. **Put your captains' real phrases there.**
 - Bingo works from the start, before any team exists. The team drop-down fills in as captains create teams.
 - The phone only says "square 5 is ticked". The **server counts the lines**: 4 rows, 4 columns and 2 diagonals.
 
@@ -335,7 +335,7 @@ Delete `backend/state.json` and restart the backend before each script. Each one
 
 **The week before**
 
-- [ ] Put the real phrases in `backend/boards.py`, 16 per captain, and give each card a title.
+- [ ] Put the real phrases in `backend/boards.py`: 5 cards (one per team captain), 16 phrases each, and give each card a title.
 - [ ] Put your images and sounds in `backend/media/`.
 - [ ] Set your own `HOST_PASSWORD`.
 - [ ] Do a dry run on real phones (see below).
@@ -385,7 +385,7 @@ The automated tests ran on Linux with headless Chromium in phone-sized windows. 
 - **Real phones** (iOS Safari, Android Chrome) over **real Wi-Fi**.
 - The **Windows firewall** and Private network steps.
 - **Sound on a real TV browser.** In the tests, the sound message reaches the TV, but nobody listened to it.
-- **Many phones at once.** It should be fine for a party, but it hasn't been load-tested.
+- **Many phones at once.** The game will have 10 phones (5 captains, 5 bingo players) plus the TV and the host. That should be fine, but it hasn't been load-tested. The TV layout was checked with 5 teams at 720p and 1080p.
 - `e2e.py`'s server restart step on Windows. It uses Linux `/proc` to find the server.
 
 Do a dry run with two or three real phones before the party.

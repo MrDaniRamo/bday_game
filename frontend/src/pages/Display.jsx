@@ -41,8 +41,11 @@ export default function Display() {
       <p className={state.buzzed ? "status buzzed" : "status"}>{status}</p>
       {seconds !== null && <p className="countdown">Buzzers reopen in {seconds}</p>}
 
-      <MediaLayer media={state.media} audioReady={audioReady} />
-      <Scoreboard teams={state.teams} buzzed={state.buzzed} />
+      {/* With an image up, a wide TV shows it BESIDE the scores so all teams stay visible. */}
+      <div className={state.media?.type === "image" ? "arena with-media" : "arena"}>
+        <MediaLayer media={state.media} audioReady={audioReady} />
+        <Scoreboard teams={state.teams} buzzed={state.buzzed} />
+      </div>
     </main>
   );
 }

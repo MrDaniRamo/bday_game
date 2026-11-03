@@ -28,7 +28,7 @@ header { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
 
 h1 {
   margin: 0;
-  font-size: clamp(2.5rem, 7vw, 6rem);
+  font-size: clamp(2.5rem, min(7vw, 11vh), 6rem);
   line-height: 1;
   color: var(--sun);
 }
@@ -51,10 +51,12 @@ h1 {
 }
 .board li {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 1rem 2rem;
+  gap: 1rem;
+  padding: 1.2vh 2rem;
   border-radius: 1rem;
   background: var(--panel);
-  font-size: clamp(1.5rem, 4vw, 3.5rem);
+  /* grows with the screen, but also shrinks on short screens so 5+ teams fit */
+  font-size: clamp(1.25rem, min(4vw, 5.5vh), 3.5rem);
   transition: background 0.2s, transform 0.2s;
 }
 .board li.lit { background: var(--hot); transform: scale(1.02); }
@@ -63,6 +65,14 @@ h1 {
 
 .media { display: grid; place-items: center; }
 .media img { max-width: 100%; max-height: 45vh; border-radius: 1rem; }
+.board .name { overflow-wrap: anywhere; }
+
+/* The image and the scoreboard share the space under the title. */
+.arena { display: grid; gap: 1.5rem; align-content: start; }
+@media (orientation: landscape) {
+  .arena.with-media { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
+  .with-media .media img { max-height: 58vh; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .board li { transition: none; }
