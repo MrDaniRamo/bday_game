@@ -1,37 +1,45 @@
 /* =====================================================================
    Two looks, picked with <html data-theme="...">  (see lib/useTheme.js)
 
-   quiz   - a retro quiz-show stage: navy sunburst, cream podium cards,
-            mustard lettering, a classic red buzzer. TV + captain phones.
-   reveal - the plot twist: black halftone stage, tilted sticker cards,
-            marker lettering. After the host reveals the secret bingo,
-            and always on the bingo and host pages.
+   quiz   - black halftone stage, tilted sticker cards, marker lettering.
+            TV + captain phones, until the host reveals the secret bingo.
+   reveal - a 70s game-show set: dusty-blue wall, red/orange/yellow/maroon
+            stripes and ring medallions, marquee bulbs, arch-shaped cards,
+            a ringed buzzer. After the reveal, and always on bingo and host.
 
    Every rule below uses the tokens (--bg, --card, --accent...), so a theme
    only has to change the tokens, plus a few extra touches at the end.
    ===================================================================== */
 
-:root,
-:root[data-theme="quiz"] {
-  --bg: #12305a;
-  --bg-deep: #0a1c38;
-  --text: #fff6e3;
-  --card: #fff3d6;
-  --card-text: #13284a;
-  --line: #0a1c38;            /* outlines and hard shadows */
-  --accent: #f7b928;          /* mustard: titles, highlights */
-  --good: #20b5a4;            /* teal: open, scores */
-  --bad: #e8483a;             /* red: the buzzer, warnings */
-  --muted: #50648a;           /* locked buttons */
+:root[data-theme="reveal"] {
+  /* the set's stripe colors, used for stripes, rings and shadows */
+  --maroon: #8a1c3c;
+  --red: #e0362c;
+  --orange: #f08a2c;
+  --yellow: #f7b82e;
+  --wall: #4f93b8;
+  --floor: #f2b48e;
+
+  --bg: var(--wall);
+  --bg-deep: #3a7a9e;
+  --text: #fff8ec;
+  --card: #fff2dc;
+  --card-text: #4a1426;
+  --line: var(--maroon);      /* outlines and hard shadows */
+  --accent: var(--yellow);    /* titles, highlights */
+  --good: var(--orange);      /* "playing", bonus points */
+  --bad: var(--red);          /* the buzzer, warnings */
+  --muted: #7d98aa;           /* locked buttons */
   --field: #fffaf0;           /* text inputs */
-  --radius: 1rem;
+  --radius: 1.4rem;           /* round, like the set's arches */
   --pop: 0 0.35rem 0 var(--line);
   --font-head: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
   --font-num: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
   --font-body: system-ui, "Segoe UI", sans-serif;
 }
 
-:root[data-theme="reveal"] {
+:root,
+:root[data-theme="quiz"] {
   --bg: #121212;
   --bg-deep: #000;
   --text: #f7f6ef;
@@ -61,17 +69,22 @@ body {
   font-family: var(--font-body);
   color: var(--text);
   background-color: var(--bg);
-  /* quiz: a soft spotlight with sunburst rays from the top of the stage */
-  background-image:
-    repeating-conic-gradient(from 0deg at 50% -10%, rgb(255 255 255 / 0.045) 0 5deg, transparent 5deg 10deg),
-    radial-gradient(ellipse at 50% 0%, #22548f 0%, var(--bg) 50%, var(--bg-deep) 100%);
+  /* quiz: a printed halftone dot pattern */
+  background-image: radial-gradient(rgb(255 255 255 / 0.09) 1.4px, transparent 1.6px);
+  background-size: 1.1rem 1.1rem;
   background-attachment: fixed;
 }
 
 [data-theme="reveal"] body {
-  /* reveal: a printed halftone dot pattern */
-  background-image: radial-gradient(rgb(255 255 255 / 0.09) 1.4px, transparent 1.6px);
-  background-size: 1.1rem 1.1rem;
+  /* reveal: the blue set wall with two ring medallions and a peach floor */
+  background-image:
+    radial-gradient(circle at 104% 26%, var(--yellow) 0 2.6rem, var(--orange) 2.6rem 4.4rem,
+      var(--red) 4.4rem 6.2rem, var(--maroon) 6.2rem 7.6rem, transparent 7.6rem),
+    radial-gradient(circle at -4% 78%, var(--yellow) 0 2.2rem, var(--orange) 2.2rem 3.8rem,
+      var(--red) 3.8rem 5.4rem, var(--maroon) 5.4rem 6.6rem, transparent 6.6rem),
+    linear-gradient(to top, var(--floor) 0 5vh, transparent 5vh),
+    linear-gradient(to bottom, var(--wall), var(--bg-deep));
+  background-size: auto;
 }
 
 h1, h2 { font-family: var(--font-head); font-weight: 700; }
@@ -359,39 +372,39 @@ header { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
 .danger-zone { border-color: var(--bad); }
 
 /* =====================================================================
-   Extra touches for the reveal look
+   Extra touches for the quiz look (marker and stickers)
    ===================================================================== */
 /* marker headings sit a little crooked, with a highlighter stroke */
-[data-theme="reveal"] h1 {
+[data-theme="quiz"] h1 {
   color: var(--text);
   text-shadow: 0.05em 0.05em 0 var(--bad);
   transform: rotate(-1.5deg);
   transform-origin: left center;
 }
-[data-theme="reveal"] .panel h2 {
+[data-theme="quiz"] .panel h2 {
   padding: 0 0.4rem;
   background: linear-gradient(transparent 45%, var(--accent) 45%, var(--accent) 90%, transparent 90%);
   transform: rotate(-1deg);
 }
-[data-theme="reveal"] .status { transform: rotate(-0.5deg); }
+[data-theme="quiz"] .status { transform: rotate(-0.5deg); }
 
 /* stickers slapped on at slightly different angles */
-[data-theme="reveal"] .board li:nth-child(odd)  { transform: rotate(-0.7deg); }
-[data-theme="reveal"] .board li:nth-child(even) { transform: rotate(0.6deg); }
-[data-theme="reveal"] .board li.lit { transform: rotate(-1deg) scale(1.03); }
-[data-theme="reveal"] .board .score { background: var(--bad); color: #fff; }
-[data-theme="reveal"] .score .bonus { color: var(--accent); }
-[data-theme="reveal"] .square:nth-child(3n)   { transform: rotate(-1.5deg); }
-[data-theme="reveal"] .square:nth-child(3n+1) { transform: rotate(1deg); }
-[data-theme="reveal"] .panel:nth-of-type(even) { transform: rotate(0.25deg); }
-[data-theme="reveal"] .panel:nth-of-type(odd)  { transform: rotate(-0.25deg); }
+[data-theme="quiz"] .board li:nth-child(odd)  { transform: rotate(-0.7deg); }
+[data-theme="quiz"] .board li:nth-child(even) { transform: rotate(0.6deg); }
+[data-theme="quiz"] .board li.lit { transform: rotate(-1deg) scale(1.03); }
+[data-theme="quiz"] .board .score { background: var(--bad); color: #fff; }
+[data-theme="quiz"] .score .bonus { color: var(--accent); }
+[data-theme="quiz"] .square:nth-child(3n)   { transform: rotate(-1.5deg); }
+[data-theme="quiz"] .square:nth-child(3n+1) { transform: rotate(1deg); }
+[data-theme="quiz"] .panel:nth-of-type(even) { transform: rotate(0.25deg); }
+[data-theme="quiz"] .panel:nth-of-type(odd)  { transform: rotate(-0.25deg); }
 
 /* on the black stage the buzzer needs a light ring to stand out */
-[data-theme="reveal"] .buzzer {
+[data-theme="quiz"] .buzzer {
   border-color: var(--text);
   box-shadow: 0 0.7rem 0 var(--bad), inset 0 -0.9rem 0 rgb(0 0 0 / 0.22), inset 0 0.6rem 0 rgb(255 255 255 / 0.25);
 }
-[data-theme="reveal"] .buzzer:active:not(:disabled) {
+[data-theme="quiz"] .buzzer:active:not(:disabled) {
   box-shadow: 0 0.2rem 0 var(--bad), inset 0 -0.5rem 0 rgb(0 0 0 / 0.22);
 }
 
@@ -433,3 +446,81 @@ header { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
   .board li { transition: none; }
   .board li.lit, .reveal-overlay, .reveal-overlay p { animation: none !important; }
 }
+
+/* =====================================================================
+   Extra touches for the reveal look (the 70s game-show set)
+   ===================================================================== */
+/* a stripe band across the top of the screen */
+[data-theme="reveal"] body::before {
+  content: ""; position: fixed; inset: 0 0 auto 0; height: 1.25rem; z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+    var(--maroon) 0 25%, var(--red) 25% 50%, var(--orange) 50% 75%, var(--yellow) 75% 100%);
+}
+/* marquee light-bulb strips down both sides (big screens only) */
+@media (min-width: 900px) {
+  [data-theme="reveal"] body::after {
+    content: ""; position: fixed; inset: 0; z-index: 4; pointer-events: none;
+    background:
+      radial-gradient(circle, #fffbe8 0 0.24rem, #ffe9a8 0.3rem, transparent 0.38rem) left 0 top 1.4rem / 1.2rem 1.7rem repeat-y,
+      radial-gradient(circle, #fffbe8 0 0.24rem, #ffe9a8 0.3rem, transparent 0.38rem) right 0 top 1.4rem / 1.2rem 1.7rem repeat-y,
+      linear-gradient(to right, var(--yellow) 0 1.2rem, transparent 1.2rem calc(100% - 1.2rem), var(--yellow) 0);
+  }
+}
+.stage, .screen, .host { position: relative; z-index: 1; }
+
+/* 70s title: cream letters with stacked stripe shadows */
+[data-theme="reveal"] h1 {
+  color: var(--text);
+  text-shadow:
+    0.035em 0.035em 0 var(--yellow), 0.07em 0.07em 0 var(--orange),
+    0.105em 0.105em 0 var(--red), 0.14em 0.14em 0 var(--maroon);
+}
+[data-theme="reveal"] .screen { padding-top: 2.25rem; }   /* room for the stripe band */
+[data-theme="reveal"] .host { padding-top: 2rem; }
+
+/* cards get a stripe header, like the set's screen */
+[data-theme="reveal"] .panel {
+  padding-top: 1.75rem;
+  background:
+    linear-gradient(to bottom, var(--maroon) 0 0.25rem, var(--red) 0.25rem 0.5rem,
+      var(--orange) 0.5rem 0.75rem, var(--yellow) 0.75rem 1rem, var(--card) 1rem);
+}
+[data-theme="reveal"] .board .score { background: var(--maroon); color: var(--yellow); }
+[data-theme="reveal"] .board li.lit { background: var(--yellow); }
+
+/* the buzzer looks like the arch podium seen from above: nested rings */
+[data-theme="reveal"] .buzzer {
+  border: 0;
+  box-shadow:
+    0 0 0 0.6rem var(--yellow), 0 0 0 1.2rem var(--orange),
+    0 0 0 1.8rem var(--maroon), 0 0.6rem 0 1.8rem rgb(0 0 0 / 0.25),
+    inset 0 -0.9rem 0 rgb(0 0 0 / 0.2);
+  margin: 1.8rem;
+  width: min(66vw, 18rem);
+}
+[data-theme="reveal"] .buzzer:active:not(:disabled) {
+  transform: scale(0.97);
+  box-shadow:
+    0 0 0 0.6rem var(--yellow), 0 0 0 1.2rem var(--orange),
+    0 0 0 1.8rem var(--maroon), inset 0 -0.4rem 0 rgb(0 0 0 / 0.2);
+}
+
+/* bingo squares: cream tiles with arch tops; ticked ones circled in red */
+[data-theme="reveal"] .square { border-radius: 1.2rem 1.2rem 0.4rem 0.4rem; }
+
+/* the reveal moment: concentric 70s rings behind the words */
+[data-theme="reveal"] .reveal-overlay {
+  background: repeating-radial-gradient(circle at 50% 55%,
+    var(--yellow) 0 3.5vmax, var(--orange) 3.5vmax 7vmax,
+    var(--red) 7vmax 10.5vmax, var(--maroon) 10.5vmax 14vmax);
+}
+[data-theme="reveal"] .twist-1 {
+  color: var(--text);
+  text-shadow: 0.04em 0.04em 0 var(--maroon), 0.08em 0.08em 0 rgb(0 0 0 / 0.3);
+}
+[data-theme="reveal"] .twist-2 {
+  justify-self: center; padding: 0.2em 0.8em; border-radius: 99rem;
+  background: var(--card); color: var(--card-text); border: 0.12em solid var(--maroon);
+}
+[data-theme="reveal"] .twist-3 { background: var(--wall); border-color: var(--maroon); box-shadow: 0.08em 0.08em 0 var(--maroon); }

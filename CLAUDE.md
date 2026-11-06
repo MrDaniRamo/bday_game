@@ -31,8 +31,8 @@ DONE and verified (42 pytest tests; Playwright phone tests `e2e.py`, `e2e_bingo.
 backend `backend/main.py`, `backend/boards.py`, `backend/test_game.py`; frontend display, team phone, bingo page,
 and the host page (`frontend/src/pages/Host.jsx`: login, start/lobby, buzzers + reopen delay, points, free/remove,
 media from `backend/media/`, bingo panel with apply and reveal, password-confirmed reset). Guide: `guide/GUIDE.md`.
-Looks: `quiz` (retro quiz show) for TV + team phones until the host reveals the bingo, then `reveal` (plot twist);
-bingo + host always `reveal`. Set by `lib/useTheme.js` as `<html data-theme>`; colors/fonts are tokens in `index.css`.
+Looks: `quiz` (black stage, sticker cards, marker font) for TV + team phones until the host reveals the bingo,
+then `reveal` (70s game-show set: blue wall, red/orange/yellow/maroon stripes and rings, marquee bulbs); bingo + host always `reveal`. Set by `lib/useTheme.js` as `<html data-theme>`; colors/fonts are tokens in `index.css`.
 TODO:
 - Real phrases are in `backend/boards.py` (cards Max, Oto, Pato, Aldape, Gugin), but some are still "falta"
   placeholders: Max 6, Pato 1, Gugin 5. Replace them when the owner sends the missing phrases.
