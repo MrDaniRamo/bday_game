@@ -90,7 +90,8 @@ function BoardGame({ saved, onForget }) {
         </>
       )}
 
-      <div className="card" role="grid" aria-label="Bingo card">
+      {/* lang="es": the phrases are in Spanish, so long words break with Spanish rules */}
+      <div className="card" role="grid" aria-label="Bingo card" lang="es">
         {mine.phrases.map((phrase, i) => (
           <button key={i} type="button" role="gridcell"
             aria-pressed={mine.marks[i]}

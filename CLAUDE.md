@@ -32,7 +32,8 @@ backend `backend/main.py`, `backend/boards.py`, `backend/test_game.py`; frontend
 and the host page (`frontend/src/pages/Host.jsx`: login, start/lobby, buzzers + reopen delay, points, free/remove,
 media from `backend/media/`, bingo panel with apply, password-confirmed reset). Guide: `guide/GUIDE.md`.
 TODO:
-- Put the real captain phrases in `backend/boards.py` (owner provides them).
+- Real phrases are in `backend/boards.py` (cards Max, Oto, Pato, Aldape, Gugin), but some are still "falta"
+  placeholders: Max 6, Pato 1, Gugin 5. Replace them when the owner sends the missing phrases.
 - Dry run on real phones over Wi-Fi (see Network below), then the party-day checklist in the guide.
 - The old PDF guides are outdated; `guide/GUIDE.md` replaces them.
 

@@ -38,7 +38,7 @@ with sync_playwright() as p:
     T.goto(URL + "/team"); T.fill("#team-name", "Reds"); T.click(".swatch >> nth=0"); T.click("button[type=submit]")
     T.wait_for_selector("text=Waiting for the host")
     wait_text(H, "captain connected"); ok("host sees the team", "Reds" in H.inner_text(".teams"))
-    G.goto(URL + "/bingo"); G.click("text=Board 1"); G.wait_for_selector(".card")
+    G.goto(URL + "/bingo"); G.click("text=Max"); G.wait_for_selector(".card")
     for i in (0, 1, 2, 3): G.click(f".square >> nth={i}")
     G.wait_for_function("document.querySelector('.lines').innerText==='Lines: 1'")
     G.select_option("#bingo-team", label="Reds")
