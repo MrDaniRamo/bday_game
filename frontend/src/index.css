@@ -426,18 +426,15 @@ header { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
   animation: overlay-out 7s forwards;
 }
 .reveal-overlay p { margin: 0; }
-.reveal-overlay .twist-3 { margin-top: 2vh; }
 .twist-1 { font-size: min(13vw, 20vh); line-height: 1; animation: slam 0.6s 0.1s both; }
-.twist-2 { font-size: min(4.5vw, 6vh); animation: fade-up 0.6s 1.4s both; }
-.twist-3 {
-  justify-self: center;
-  font-family: var(--font-num); font-size: min(16vw, 24vh); line-height: 1;
-  padding: 0.05em 0.3em; color: #fff; background: var(--bad);
-  border: 0.06em solid var(--line); box-shadow: 0.08em 0.08em 0 var(--line);
-  animation: stamp 0.5s 2.8s both, wobble 0.9s 3.4s 3 ease-in-out;
+/* the punchline: stamped on after "Plot twist!", then it wobbles */
+.reveal-overlay .twist-2 {
+  max-width: 90vw; margin-top: 2vh;
+  font-size: min(4.2vw, 6.5vh); line-height: 1.1;
+  animation: stamp 0.5s 1.6s both, wobble 0.9s 2.2s 4 ease-in-out;
 }
+.twist-2 strong { display: block; font-size: 1.9em; line-height: 1.05; }
 @keyframes slam { from { transform: scale(3) rotate(-12deg); opacity: 0; } to { transform: scale(1) rotate(-3deg); opacity: 1; } }
-@keyframes fade-up { from { transform: translateY(1em); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes stamp { from { transform: scale(2.4) rotate(8deg); opacity: 0; } to { transform: rotate(-4deg); opacity: 1; } }
 @keyframes wobble { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg) scale(1.05); } }
 @keyframes overlay-out { 0%, 90% { opacity: 1; } 100% { opacity: 0; } }
@@ -520,7 +517,7 @@ header { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
   text-shadow: 0.04em 0.04em 0 var(--maroon), 0.08em 0.08em 0 rgb(0 0 0 / 0.3);
 }
 [data-theme="reveal"] .twist-2 {
-  justify-self: center; padding: 0.2em 0.8em; border-radius: 99rem;
-  background: var(--card); color: var(--card-text); border: 0.12em solid var(--maroon);
+  justify-self: center; padding: 0.35em 1em 0.45em; border-radius: 1.2em;
+  background: var(--wall); color: var(--text);
+  border: 0.08em solid var(--maroon); box-shadow: 0.08em 0.08em 0 var(--maroon);
 }
-[data-theme="reveal"] .twist-3 { background: var(--wall); border-color: var(--maroon); box-shadow: 0.08em 0.08em 0 var(--maroon); }

@@ -58,8 +58,7 @@ export default function Display() {
       {revealing && (
         <div className="reveal-overlay" role="alert">
           <p className="twist-1">Plot twist!</p>
-          <p className="twist-2">Let's get ready for a Game Changer!</p>
-          <p className="twist-3">BINGO!</p>
+          <p className="twist-2">Let's get ready for a <strong>Game Changer!</strong></p>
         </div>
       )}
     </main>
