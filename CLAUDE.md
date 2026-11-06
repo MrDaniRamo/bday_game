@@ -27,10 +27,12 @@ understand the code (what, why, how to test, interview questions). Build first, 
    `apply_bingo`, which sets each team's `bingo_bonus = lines * POINTS_PER_LINE` (idempotent). Scoreboard total = score + bonus.
 
 ## Status
-DONE and verified (39 pytest tests; Playwright phone tests `e2e.py`, `e2e_bingo.py`, `e2e_host.py`):
+DONE and verified (42 pytest tests; Playwright phone tests `e2e.py`, `e2e_bingo.py`, `e2e_host.py`):
 backend `backend/main.py`, `backend/boards.py`, `backend/test_game.py`; frontend display, team phone, bingo page,
 and the host page (`frontend/src/pages/Host.jsx`: login, start/lobby, buzzers + reopen delay, points, free/remove,
-media from `backend/media/`, bingo panel with apply, password-confirmed reset). Guide: `guide/GUIDE.md`.
+media from `backend/media/`, bingo panel with apply and reveal, password-confirmed reset). Guide: `guide/GUIDE.md`.
+Looks: `quiz` (retro quiz show) for TV + team phones until the host reveals the bingo, then `reveal` (plot twist);
+bingo + host always `reveal`. Set by `lib/useTheme.js` as `<html data-theme>`; colors/fonts are tokens in `index.css`.
 TODO:
 - Real phrases are in `backend/boards.py` (cards Max, Oto, Pato, Aldape, Gugin), but some are still "falta"
   placeholders: Max 6, Pato 1, Gugin 5. Replace them when the owner sends the missing phrases.
@@ -40,7 +42,7 @@ TODO:
 ## Message protocol (JSON over WebSocket `/ws`, shape `{"type": ..., ...}`)
 hello{role: display|team|bingo|host, ...}; team: claim{name,color | team_id}, team_edit{name,color}, buzz;
 host: phase, release, lock, points{team(id),delta}, media, auto_release{seconds}, free_team, remove_team,
-bingo_open, bingo_free, apply_bingo, reset{password}; bingo: bingo_pick{board_id}, bingo_mark{index,marked}, bingo_team{team_id}.
+bingo_open, bingo_free, apply_bingo, reset{password}, theme{theme: quiz|reveal}; bingo: bingo_pick{board_id}, bingo_mark{index,marked}, bingo_team{team_id}.
 Server replies: `state` (per-role filtered view), `error{detail}` (sender only), private `claimed` / `board_claimed` with a token.
 Teams are keyed by id (`t1`, `t2`...), not name. Game state is saved to `backend/state.json` (delete it, or use the host Reset, to start fresh).
 Media: files in `backend/media/` are served at `:8000/media/<name>`; the host view lists them as `media_files`.

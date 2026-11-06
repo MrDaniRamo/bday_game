@@ -1,21 +1,100 @@
-:root {
-  --ink: #1b1340;
-  --panel: #2c2266;
-  --paper: #fff4e0;
-  --hot: #ff3d7f;
-  --sun: #ffc63d;
-  --mint: #2bd9a8;
-  font-family: system-ui, "Segoe UI", sans-serif;
+/* =====================================================================
+   Two looks, picked with <html data-theme="...">  (see lib/useTheme.js)
+
+   quiz   - a retro quiz-show stage: navy sunburst, cream podium cards,
+            mustard lettering, a classic red buzzer. TV + captain phones.
+   reveal - the plot twist: black halftone stage, tilted sticker cards,
+            marker lettering. After the host reveals the secret bingo,
+            and always on the bingo and host pages.
+
+   Every rule below uses the tokens (--bg, --card, --accent...), so a theme
+   only has to change the tokens, plus a few extra touches at the end.
+   ===================================================================== */
+
+:root,
+:root[data-theme="quiz"] {
+  --bg: #12305a;
+  --bg-deep: #0a1c38;
+  --text: #fff6e3;
+  --card: #fff3d6;
+  --card-text: #13284a;
+  --line: #0a1c38;            /* outlines and hard shadows */
+  --accent: #f7b928;          /* mustard: titles, highlights */
+  --good: #20b5a4;            /* teal: open, scores */
+  --bad: #e8483a;             /* red: the buzzer, warnings */
+  --muted: #50648a;           /* locked buttons */
+  --field: #fffaf0;           /* text inputs */
+  --radius: 1rem;
+  --pop: 0 0.35rem 0 var(--line);
+  --font-head: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --font-num: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: system-ui, "Segoe UI", sans-serif;
 }
 
+:root[data-theme="reveal"] {
+  --bg: #121212;
+  --bg-deep: #000;
+  --text: #f7f6ef;
+  --card: #fffdf3;
+  --card-text: #111;
+  --line: #000;
+  --accent: #ffe14a;          /* highlighter yellow */
+  --good: #22d3ff;            /* cyan */
+  --bad: #ff2e88;             /* magenta */
+  --muted: #5a5a5a;
+  --field: #fff;
+  --radius: 0.35rem;
+  --pop: 0.3rem 0.3rem 0 var(--bad);
+  --font-head: "Permanent Marker", "Comic Sans MS", "Segoe Print", cursive;
+  --font-num: "Archivo Black", "Arial Black", Impact, sans-serif;
+  --font-body: system-ui, "Segoe UI", sans-serif;
+}
+
+/* ---------- base ---------- */
 * { box-sizing: border-box; }
+
+/* no pull-to-refresh by accident */
+html, body { height: 100%; overscroll-behavior: none; }
 
 body {
   margin: 0;
-  background: var(--ink);
-  color: var(--paper);
+  font-family: var(--font-body);
+  color: var(--text);
+  background-color: var(--bg);
+  /* quiz: a soft spotlight with sunburst rays from the top of the stage */
+  background-image:
+    repeating-conic-gradient(from 0deg at 50% -10%, rgb(255 255 255 / 0.045) 0 5deg, transparent 5deg 10deg),
+    radial-gradient(ellipse at 50% 0%, #22548f 0%, var(--bg) 50%, var(--bg-deep) 100%);
+  background-attachment: fixed;
 }
 
+[data-theme="reveal"] body {
+  /* reveal: a printed halftone dot pattern */
+  background-image: radial-gradient(rgb(255 255 255 / 0.09) 1.4px, transparent 1.6px);
+  background-size: 1.1rem 1.1rem;
+}
+
+h1, h2 { font-family: var(--font-head); font-weight: 700; }
+
+h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, min(7vw, 11vh), 6rem);
+  line-height: 1;
+  color: var(--accent);
+  letter-spacing: 0.01em;
+  text-shadow: 0 0.06em 0 var(--line), 0 0.12em 0.1em rgb(0 0 0 / 0.35);
+}
+
+button { font-family: var(--font-body); }
+
+.hint { margin: 0; opacity: 0.8; }
+.problem { margin: 0; color: var(--bad); font-weight: 700; text-align: center; }
+.offline { color: var(--bad); font-size: 1.5rem; font-weight: 700; }
+.empty { font-size: 1.5rem; opacity: 0.8; }
+
+/* =====================================================================
+   TV display (/)
+   ===================================================================== */
 .stage {
   min-height: 100vh;
   padding: 2rem 4vw;
@@ -26,46 +105,20 @@ body {
 
 header { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
 
-h1 {
-  margin: 0;
-  font-size: clamp(2.5rem, min(7vw, 11vh), 6rem);
-  line-height: 1;
-  color: var(--sun);
+.status {
+  margin: 0; font-size: clamp(1.5rem, 4vw, 3.5rem); font-weight: 700;
+  font-family: var(--font-head);
 }
-
-.status { margin: 0; font-size: clamp(1.5rem, 4vw, 3.5rem); font-weight: 700; }
-.status.buzzed { color: var(--hot); }
-.offline { color: var(--hot); font-size: 1.5rem; }
-.empty { font-size: 1.5rem; opacity: 0.7; }
+.status.buzzed { color: var(--accent); }
+.countdown { margin: 0; font-size: clamp(1.1rem, 3vw, 2.25rem); opacity: 0.9; }
 
 .start {
-  font: inherit; font-size: 1.1rem; padding: 0.6rem 1.2rem;
-  border: 0; border-radius: 0.6rem; background: var(--sun); color: var(--ink);
+  font-size: 1.1rem; font-weight: 700; padding: 0.6rem 1.2rem;
+  border: 3px solid var(--line); border-radius: var(--radius);
+  background: var(--accent); color: var(--card-text); box-shadow: var(--pop);
   cursor: pointer;
 }
-.start:focus-visible { outline: 3px solid var(--paper); outline-offset: 3px; }
-
-.board {
-  list-style: none; margin: 0; padding: 0;
-  display: grid; gap: 0.75rem;
-}
-.board li {
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 1rem;
-  padding: 1.2vh 2rem;
-  border-radius: 1rem;
-  background: var(--panel);
-  /* grows with the screen, but also shrinks on short screens so 5+ teams fit */
-  font-size: clamp(1.25rem, min(4vw, 5.5vh), 3.5rem);
-  transition: background 0.2s, transform 0.2s;
-}
-.board li.lit { background: var(--hot); transform: scale(1.02); }
-.score { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--mint); }
-.lit .score { color: var(--paper); }
-
-.media { display: grid; place-items: center; }
-.media img { max-width: 100%; max-height: 45vh; border-radius: 1rem; }
-.board .name { overflow-wrap: anywhere; }
+.start:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
 
 /* The image and the scoreboard share the space under the title. */
 .arena { display: grid; gap: 1.5rem; align-content: start; }
@@ -74,14 +127,57 @@ h1 {
   .with-media .media img { max-height: 58vh; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .board li { transition: none; }
+.media { display: grid; place-items: center; }
+.media img {
+  max-width: 100%; max-height: 45vh;
+  border: 0.4rem solid var(--card); border-radius: var(--radius);
+  box-shadow: var(--pop);
 }
 
-/* ---------- team phone page ---------- */
-/* no pull-to-refresh by accident */
-html, body { height: 100%; overscroll-behavior: none; }
+/* Scoreboard rows look like contestant podiums */
+.board {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: 0.9rem;
+}
+.board li {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 1rem;
+  padding: 1vh 0.6rem 1vh 1.6rem;
+  border: 0.2rem solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--card-text);
+  box-shadow: var(--pop);
+  font-family: var(--font-head);
+  font-weight: 600;
+  /* grows with the screen, but also shrinks on short screens so 5+ teams fit */
+  font-size: clamp(1.25rem, min(4vw, 5.5vh), 3.5rem);
+  transition: background 0.2s, transform 0.2s;
+}
+.board .name { overflow-wrap: anywhere; }
+.board li.lit { background: var(--accent); transform: scale(1.03); animation: buzz-in 0.5s ease-out; }
 
+/* the score sits in a dark "display panel" on the podium */
+.score {
+  font-family: var(--font-num); font-weight: 700;
+  font-variant-numeric: tabular-nums; color: var(--good);
+}
+.board .score {
+  min-width: 3.2em; padding: 0.05em 0.45em; text-align: center;
+  border-radius: calc(var(--radius) * 0.7);
+  background: var(--line); color: var(--accent);
+}
+.score .bonus { display: block; font-size: 0.4em; font-weight: 600; color: var(--good); }
+
+@keyframes buzz-in {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.07); }
+  100% { transform: scale(1.03); }
+}
+
+/* =====================================================================
+   Phones: team (/team) and bingo (/bingo)
+   ===================================================================== */
 .screen {
   min-height: 100vh;
   min-height: 100dvh;                  /* dvh accounts for the phone's browser bars */
@@ -93,156 +189,247 @@ html, body { height: 100%; overscroll-behavior: none; }
   user-select: none;
   -webkit-user-select: none;
 }
-
-.screen h1 { font-size: clamp(1.75rem, 8vw, 2.75rem); text-align: center; }
-.hint { margin: 0; opacity: 0.75; }
-.problem { margin: 0; color: var(--hot); font-weight: 700; text-align: center; }
+.screen h1 { font-size: clamp(1.9rem, 9vw, 2.9rem); text-align: center; }
 
 .join form { display: grid; gap: 0.75rem; width: min(100%, 22rem); }
-.join label { font-weight: 600; }
+.join label, .join .label { font-weight: 700; }
 .join input {
   font: inherit; font-size: 1.25rem; padding: 0.75rem 1rem;
-  border: 2px solid var(--panel); border-radius: 0.75rem;
-  background: var(--paper); color: var(--ink);
+  border: 3px solid var(--line); border-radius: var(--radius);
+  background: var(--field); color: var(--card-text);
   user-select: text; -webkit-user-select: text;
 }
-.join button, .choices button {
-  font: inherit; font-size: 1.25rem; font-weight: 700; padding: 0.85rem 1rem;
-  border: 0; border-radius: 0.75rem; background: var(--sun); color: var(--ink);
+.join button:not(.swatch), .choices button, .big {
+  font-size: 1.25rem; font-weight: 700; padding: 0.85rem 1.5rem;
+  border: 3px solid var(--line); border-radius: var(--radius);
+  background: var(--accent); color: var(--card-text);
+  box-shadow: var(--pop);
   min-height: 3rem; cursor: pointer;
 }
-.join button:disabled { opacity: 0.4; }
-.choices { display: grid; gap: 0.75rem; width: min(100%, 22rem); margin-top: 0.5rem; }
+.join button:not(.swatch):disabled, .choices button:disabled { opacity: 0.45; box-shadow: none; cursor: default; }
+.choices { display: grid; gap: 0.9rem; width: min(100%, 22rem); margin-top: 0.5rem; }
 
-.game { justify-content: center; }
-.game header { flex-direction: column; gap: 0; text-align: center; }
-.game .score {
-  margin: 0.25rem 0 0; font-size: clamp(3rem, 16vw, 5rem); font-weight: 800;
-  font-variant-numeric: tabular-nums; color: var(--mint);
-}
-
-.buzzer {
-  width: min(80vw, 22rem); aspect-ratio: 1; border-radius: 50%;
-  border: 0; padding: 1rem;
-  font: inherit; font-size: clamp(1.5rem, 7vw, 2.25rem); font-weight: 800;
-  color: var(--ink);
-  touch-action: manipulation;          /* no double-tap zoom delay */
-  -webkit-tap-highlight-color: transparent;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-}
-.buzzer:active:not(:disabled) { transform: scale(0.96); }
-.buzzer.open    { background: var(--mint); }
-.buzzer.won     { background: var(--sun); }
-.buzzer.lost    { background: var(--hot); color: var(--paper); }
-.buzzer.locked,
-.buzzer.offline { background: #5b5480; color: var(--paper); }
-.buzzer:disabled { cursor: default; }
-.buzzer:focus-visible { outline: 4px solid var(--paper); outline-offset: 4px; }
-
-.link {
-  font: inherit; background: none; border: 0; color: var(--paper);
-  opacity: 0.7; text-decoration: underline; padding: 0.75rem; min-height: 3rem;
-}
-
-/* countdown until the buzzers reopen (display and phones) */
-.countdown { margin: 0; font-size: clamp(1.1rem, 3vw, 2.25rem); opacity: 0.85; }
-
-/* ---------- team joining ---------- */
-.join .label { font-weight: 600; }
 .swatches { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .swatch {
   width: 3rem; height: 3rem; border-radius: 50%; padding: 0; cursor: pointer;
-  border: 3px solid transparent;
+  border: 3px solid var(--line);
 }
-.swatch.picked { border-color: var(--paper); box-shadow: 0 0 0 3px var(--ink) inset; }
+.swatch.picked { box-shadow: 0 0 0 4px var(--text); }
 .swatch:disabled { opacity: 0.2; cursor: not-allowed; }
-.swatch:focus-visible { outline: 3px solid var(--paper); outline-offset: 3px; }
-.big {
-  font: inherit; font-size: 1.25rem; font-weight: 700; padding: 0.85rem 1.5rem;
-  border: 0; border-radius: 0.75rem; background: var(--sun);
-  color: var(--ink); min-height: 3rem;
+.swatch:focus-visible { outline: 3px solid var(--text); outline-offset: 4px; }
+
+.link {
+  font: inherit; background: none; border: 0; color: var(--text);
+  opacity: 0.75; text-decoration: underline; padding: 0.75rem; min-height: 3rem;
 }
 
+/* ---------- the buzzer: a big arcade button ---------- */
+.game { justify-content: center; }
+.game header { flex-direction: column; gap: 0; text-align: center; }
+.game .score { margin: 0.25rem 0 0; font-size: clamp(3rem, 16vw, 5rem); color: var(--accent); }
+
+.buzzer {
+  width: min(78vw, 21rem); aspect-ratio: 1; border-radius: 50%;
+  padding: 1rem;
+  border: 0.7rem solid var(--line);
+  box-shadow: 0 0.7rem 0 var(--line), inset 0 -0.9rem 0 rgb(0 0 0 / 0.22), inset 0 0.6rem 0 rgb(255 255 255 / 0.25);
+  font-family: var(--font-head); font-size: clamp(1.6rem, 8vw, 2.5rem); font-weight: 700;
+  color: #fff;
+  touch-action: manipulation;          /* no double-tap zoom delay */
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.08s, box-shadow 0.08s;
+}
+.buzzer:active:not(:disabled) {
+  transform: translateY(0.5rem);
+  box-shadow: 0 0.2rem 0 var(--line), inset 0 -0.5rem 0 rgb(0 0 0 / 0.22);
+}
+.buzzer.open    { background: var(--bad); }
+.buzzer.won     { background: var(--accent); color: var(--card-text); }
+.buzzer.lost    { background: var(--muted); }
+.buzzer.locked,
+.buzzer.offline { background: var(--muted); color: rgb(255 255 255 / 0.85); }
+.buzzer:disabled { cursor: default; }
+.buzzer:focus-visible { outline: 4px solid var(--text); outline-offset: 6px; }
+
 /* ---------- bingo card ---------- */
-.bingo label { font-weight: 600; }
+.bingo label { font-weight: 700; }
 .bingo select {
   font: inherit; font-size: 1.1rem; padding: 0.75rem 1rem; width: min(100%, 22rem);
-  border: 2px solid var(--panel); border-radius: 0.75rem;
-  background: var(--paper); color: var(--ink);
+  border: 3px solid var(--line); border-radius: var(--radius);
+  background: var(--field); color: var(--card-text);
 }
 .card {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem;
   width: min(100%, 26rem);
 }
 .square {
-  aspect-ratio: 1; padding: 0.3rem; border: 2px solid var(--panel); border-radius: 0.6rem;
-  background: var(--panel); color: var(--paper);
-  font: inherit; font-size: clamp(0.62rem, 2.8vw, 0.85rem); line-height: 1.15;
+  position: relative;
+  aspect-ratio: 1; padding: 0.3rem;
+  border: 2px solid var(--line); border-radius: var(--radius);
+  background: var(--card); color: var(--card-text);
+  font: inherit; font-size: clamp(0.62rem, 2.8vw, 0.85rem); font-weight: 600; line-height: 1.15;
   overflow-wrap: anywhere; hyphens: auto; cursor: pointer;
   touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
-.square.on {
-  background: var(--mint); border-color: var(--mint);
-  color: var(--ink); font-weight: 700;
+.square.on { background: var(--accent); font-weight: 800; }
+/* a marker circle around a ticked square */
+.square.on::after {
+  content: ""; position: absolute; inset: 6%;
+  border: 3px solid var(--bad); border-radius: 50%;
+  transform: rotate(-8deg); pointer-events: none;
 }
-.square:disabled { cursor: default; opacity: 0.7; }
-.square:focus-visible { outline: 3px solid var(--paper); outline-offset: 2px; }
-.lines { margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--sun); }
+.square:disabled { cursor: default; opacity: 0.75; }
+.square:focus-visible { outline: 3px solid var(--good); outline-offset: 2px; }
+.lines { margin: 0; font-family: var(--font-head); font-size: 1.9rem; color: var(--accent); }
 
-/* ---------- scoreboard: bingo bonus, once the host applies it ---------- */
-.score .bonus { display: block; font-size: 0.4em; font-weight: 600; color: var(--sun); }
-.lit .score .bonus { color: var(--paper); }
-
-/* ---------- host page: a laptop or phone screen full of controls ---------- */
+/* =====================================================================
+   Host page (/host)
+   ===================================================================== */
 .host {
   max-width: 60rem;
   margin: 0 auto;
   padding: 1rem 16px 4rem;
   display: grid;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 .host-top { gap: 0.75rem; }
-.host-top h1 { font-size: clamp(1.5rem, 5vw, 2.25rem); }
-.host h2 { margin: 0 0 0.5rem; font-size: 1.2rem; color: var(--sun); }
-.host button {
-  font: inherit; font-weight: 700; padding: 0.55rem 1rem; border: 0;
-  border-radius: 0.6rem; background: #5b5480; color: var(--paper); cursor: pointer;
+.host-top h1 { font-size: clamp(1.8rem, 6vw, 2.75rem); }
+.host .problem { text-align: left; }
+
+/* each panel is a white "card" with black text */
+.panel {
+  background: var(--card); color: var(--card-text);
+  border: 3px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--pop);
+  padding: 1rem; display: grid; gap: 0.6rem;
 }
-.host button:disabled { opacity: 0.4; cursor: default; }
-.host button:focus-visible, .host input:focus-visible { outline: 3px solid var(--paper); outline-offset: 2px; }
-.host button.go { background: var(--mint); color: var(--ink); }
-.host button.danger { background: var(--hot); }
-.host button.small { padding: 0.35rem 0.6rem; font-size: 0.9rem; }
+.panel h2 { margin: 0 0 0.25rem; font-size: 1.5rem; justify-self: start; }
+.panel .hint { opacity: 0.75; }
+.panel .problem { color: var(--bad); }
+
+.host button {
+  font-weight: 700; padding: 0.55rem 1rem;
+  border: 2px solid var(--line); border-radius: var(--radius);
+  background: var(--card-text); color: var(--card); cursor: pointer;
+}
+.host-top button { border-color: var(--text); }
+.host button:disabled { opacity: 0.35; cursor: default; }
+.host button:focus-visible, .host input:focus-visible { outline: 3px solid var(--good); outline-offset: 2px; }
+.host button.go { background: var(--accent); color: var(--card-text); border-color: var(--line); }
+.host button.danger { background: var(--bad); color: #fff; }
+.host button.small { padding: 0.3rem 0.6rem; font-size: 0.9rem; }
 .host input {
-  font: inherit; padding: 0.45rem 0.6rem; border-radius: 0.5rem; border: 0;
-  background: var(--paper); color: var(--ink); min-width: 0;
+  font: inherit; padding: 0.45rem 0.6rem; min-width: 0;
+  border: 2px solid var(--line); border-radius: var(--radius);
+  background: var(--field); color: var(--card-text);
 }
 .host input[type="number"] { width: 5.5rem; }
 .host input[type="url"] { flex: 1 1 12rem; }
-.host .problem { text-align: left; }
-.panel { background: var(--panel); border-radius: 1rem; padding: 1rem; display: grid; gap: 0.6rem; }
+
 .row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
 .now { margin: 0; font-size: 1.15rem; font-weight: 700; }
-.now.buzzed { color: var(--hot); }
-.pill { padding: 0.2rem 0.7rem; border-radius: 99rem; font-weight: 700; background: #5b5480; }
-.pill.playing { background: var(--mint); color: var(--ink); }
+.now.buzzed { color: var(--bad); }
+.pill {
+  padding: 0.2rem 0.75rem; border-radius: 99rem; font-weight: 800;
+  background: var(--muted); color: #fff; border: 2px solid var(--text);
+}
+.pill.playing { background: var(--good); color: var(--card-text); }
 
 .teams, .files { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
 .teams li {
   display: grid; grid-template-columns: auto 1fr auto; align-items: center;
-  gap: 0.4rem 0.75rem; padding: 0.6rem; border-radius: 0.75rem; background: var(--ink);
+  gap: 0.4rem 0.75rem; padding: 0.6rem;
+  border: 2px solid var(--line); border-radius: var(--radius);
+  background: rgb(0 0 0 / 0.04);
 }
-.teams li.lit { outline: 3px solid var(--hot); }
+.teams li.lit { background: var(--accent); }
 .teams .row { grid-column: 1 / -1; }
-.dot { width: 1.2rem; height: 1.2rem; border-radius: 50%; }
+.dot { width: 1.3rem; height: 1.3rem; border-radius: 50%; border: 2px solid var(--line); }
 .who { display: grid; }
-.who small, .pts small { opacity: 0.75; font-weight: 400; }
-.pts { font-size: 1.4rem; font-weight: 800; color: var(--mint); font-variant-numeric: tabular-nums; }
+.who small, .pts small { opacity: 0.7; font-weight: 400; }
+.pts { font-family: var(--font-num); font-size: 1.4rem; font-variant-numeric: tabular-nums; }
 .files li { display: flex; align-items: center; gap: 0.6rem; overflow-wrap: anywhere; }
 
 .scroll { overflow-x: auto; }
 .cards { width: 100%; border-collapse: collapse; }
-.cards th, .cards td { text-align: left; padding: 0.4rem; border-bottom: 1px solid #5b5480; }
+.cards th, .cards td { text-align: left; padding: 0.4rem; border-bottom: 2px solid var(--line); }
 .cards small { opacity: 0.7; }
-.danger-zone { border: 2px solid var(--hot); }
+.reveal-control { display: grid; gap: 0.5rem; padding-top: 0.6rem; border-top: 2px dashed var(--line); }
+.danger-zone { border-color: var(--bad); }
+
+/* =====================================================================
+   Extra touches for the reveal look
+   ===================================================================== */
+/* marker headings sit a little crooked, with a highlighter stroke */
+[data-theme="reveal"] h1 {
+  color: var(--text);
+  text-shadow: 0.05em 0.05em 0 var(--bad);
+  transform: rotate(-1.5deg);
+  transform-origin: left center;
+}
+[data-theme="reveal"] .panel h2 {
+  padding: 0 0.4rem;
+  background: linear-gradient(transparent 45%, var(--accent) 45%, var(--accent) 90%, transparent 90%);
+  transform: rotate(-1deg);
+}
+[data-theme="reveal"] .status { transform: rotate(-0.5deg); }
+
+/* stickers slapped on at slightly different angles */
+[data-theme="reveal"] .board li:nth-child(odd)  { transform: rotate(-0.7deg); }
+[data-theme="reveal"] .board li:nth-child(even) { transform: rotate(0.6deg); }
+[data-theme="reveal"] .board li.lit { transform: rotate(-1deg) scale(1.03); }
+[data-theme="reveal"] .board .score { background: var(--bad); color: #fff; }
+[data-theme="reveal"] .score .bonus { color: var(--accent); }
+[data-theme="reveal"] .square:nth-child(3n)   { transform: rotate(-1.5deg); }
+[data-theme="reveal"] .square:nth-child(3n+1) { transform: rotate(1deg); }
+[data-theme="reveal"] .panel:nth-of-type(even) { transform: rotate(0.25deg); }
+[data-theme="reveal"] .panel:nth-of-type(odd)  { transform: rotate(-0.25deg); }
+
+/* on the black stage the buzzer needs a light ring to stand out */
+[data-theme="reveal"] .buzzer {
+  border-color: var(--text);
+  box-shadow: 0 0.7rem 0 var(--bad), inset 0 -0.9rem 0 rgb(0 0 0 / 0.22), inset 0 0.6rem 0 rgb(255 255 255 / 0.25);
+}
+[data-theme="reveal"] .buzzer:active:not(:disabled) {
+  box-shadow: 0 0.2rem 0 var(--bad), inset 0 -0.5rem 0 rgb(0 0 0 / 0.22);
+}
+
+/* "+ secret bingo!" scribbled next to the TV title after the reveal */
+.twist-tag {
+  display: inline-block; margin-left: 0.4em;
+  font-size: 0.45em; color: var(--accent); text-shadow: none;
+  transform: rotate(-8deg) translateY(-0.3em);
+}
+
+/* ---------- the reveal moment on the TV ---------- */
+.reveal-overlay {
+  position: fixed; inset: 0; z-index: 10;
+  display: grid; place-content: center; gap: 1.5vh; text-align: center;
+  background: var(--accent); color: var(--line);
+  background-image: radial-gradient(rgb(0 0 0 / 0.12) 1.6px, transparent 1.8px);
+  background-size: 1.2rem 1.2rem;
+  font-family: var(--font-head);
+  animation: overlay-out 7s forwards;
+}
+.reveal-overlay p { margin: 0; }
+.reveal-overlay .twist-3 { margin-top: 2vh; }
+.twist-1 { font-size: min(13vw, 20vh); line-height: 1; animation: slam 0.6s 0.1s both; }
+.twist-2 { font-size: min(4.5vw, 6vh); animation: fade-up 0.6s 1.4s both; }
+.twist-3 {
+  justify-self: center;
+  font-family: var(--font-num); font-size: min(16vw, 24vh); line-height: 1;
+  padding: 0.05em 0.3em; color: #fff; background: var(--bad);
+  border: 0.06em solid var(--line); box-shadow: 0.08em 0.08em 0 var(--line);
+  animation: stamp 0.5s 2.8s both, wobble 0.9s 3.4s 3 ease-in-out;
+}
+@keyframes slam { from { transform: scale(3) rotate(-12deg); opacity: 0; } to { transform: scale(1) rotate(-3deg); opacity: 1; } }
+@keyframes fade-up { from { transform: translateY(1em); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes stamp { from { transform: scale(2.4) rotate(8deg); opacity: 0; } to { transform: rotate(-4deg); opacity: 1; } }
+@keyframes wobble { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg) scale(1.05); } }
+@keyframes overlay-out { 0%, 90% { opacity: 1; } 100% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .board li { transition: none; }
+  .board li.lit, .reveal-overlay, .reveal-overlay p { animation: none !important; }
+}

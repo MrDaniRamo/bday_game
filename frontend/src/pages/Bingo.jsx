@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useGame } from "../useGame.js";
 import { clearBoard, loadBoard, saveBoard } from "../lib/savedBoard.js";
+import { useTheme } from "../lib/useTheme.js";
 
 const NEW_PLAYER = { role: "bingo" };    // hello without a board yet
 
 export default function Bingo() {
   const [saved, setSaved] = useState(loadBoard);   // { board_id, token } or null
+  useTheme("reveal");                              // the secret game has its own look
 
   if (!saved) {
     return (

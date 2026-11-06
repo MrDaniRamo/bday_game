@@ -74,6 +74,15 @@ with sync_playwright() as p:
     H.click("text=Apply bingo bonus again"); time.sleep(0.5)
     ok("applying twice does not add twice", D.inner_text(".board li .score").startswith("19"))
 
+    # --- reveal: the TV plays the plot twist and changes look ---
+    ok("TV starts in the quiz look", D.evaluate("document.documentElement.dataset.theme") == "quiz")
+    H.click("text=Reveal the secret bingo"); D.wait_for_selector(".reveal-overlay")
+    ok("TV shows the plot twist", "Plot twist" in D.inner_text(".reveal-overlay"))
+    T.wait_for_function("document.documentElement.dataset.theme === 'reveal'")
+    ok("captain phone switches look too", True)
+    D.wait_for_selector(".reveal-overlay", state="detached", timeout=10000)
+    ok("plot twist goes away by itself", "secret bingo" in D.inner_text("h1"))
+
     # --- free a team ---
     H.click(".teams button:text-is('Free')"); T.wait_for_selector("text=Take over")
     ok("free team sends the captain to the take-over screen", True)
@@ -85,6 +94,7 @@ with sync_playwright() as p:
     H.fill("#reset-password", "party"); H.click("text=Reset game"); H.wait_for_selector(".pill.lobby")
     T.wait_for_selector("text=Start your team"); G.wait_for_selector("text=Pick your card")
     D.wait_for_selector("text=Waiting for teams")
+    ok("reset goes back to the quiz look", D.evaluate("document.documentElement.dataset.theme") == "quiz")
     ok("reset sends phones back to the start and clears the TV", "No teams yet" in H.inner_text(".panel >> nth=1"))
 
     # --- phone-sized host page ---
