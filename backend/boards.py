@@ -68,7 +68,7 @@ BOARDS = [
             "Menciona Fortnite",
             "Menciona Discord",
             "Jotea",
-            "falta2",
+            "Insulto con al menos 4 adjetivos",
         ],
     },
     {
