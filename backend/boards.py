@@ -108,7 +108,7 @@ BOARDS = [
             "Chiste cancelable",
             "Tic autista",
             "Corrige a alguien",
-            "falta1",
+            "Osea si...",
             "falta2",
             "falta3",
             "falta4",
