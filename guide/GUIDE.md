@@ -67,7 +67,7 @@ All four pages are one React app. `frontend/src/main.jsx` picks the page from th
 |---|---|
 | `backend/main.py` | The whole server: state, message handling, views, timer, saving, media |
 | `backend/boards.py` | The preset bingo cards (edit this with your captains' phrases) |
-| `backend/test_game.py` | 39 pytest tests of the game rules |
+| `backend/test_game.py` | 42 pytest tests of the game rules |
 | `backend/media/` | Images and sounds the host can put on the TV |
 | `frontend/src/useGame.js` | The WebSocket hook every page uses |
 | `frontend/src/pages/*.jsx` | Display, Team, Bingo, Host |
@@ -139,6 +139,7 @@ Every message is a JSON object with a `type`. The first message from every page 
 | host | `bingo_open {open}`, `bingo_free {board_id}` | Close or reopen ticking, free a card |
 | host | `apply_bingo` | Turn lines into bonus points |
 | host | `reset {password}` | Start a fresh game (password typed again to confirm) |
+| host | `theme {theme}` | `"quiz"` (default) or `"reveal"`: the look of the TV and the captains' phones |
 
 **Server replies**
 
@@ -237,7 +238,7 @@ After a buzz, the buzzers reopen by themselves after `auto_release_seconds` (def
 
 ## 10. Secret bingo scoring
 
-- Cards are preset in `backend/boards.py`: an id, a title and exactly 16 phrases. There are 5 cards, one for each of the 5 team captains. **Put your captains' real phrases there.**
+- Cards are preset in `backend/boards.py`: an id, a title and exactly 16 phrases. There are 5 cards, one for each captain: Max, Oto, Pato, Aldape and Gugin. A few squares still say "falta" (Max 6, Gugin 4). **Replace those with real phrases before the party.**
 - Bingo works from the start, before any team exists. The team drop-down fills in as captains create teams.
 - The phone only says "square 5 is ticked". The **server counts the lines**: 4 rows, 4 columns and 2 diagonals.
 
@@ -264,6 +265,10 @@ def count_lines(marks: list) -> int:
 - **Reset:** wipes everything. You type the host password again, and the server checks it.
 
 **Media files.** Drop images (`.png`, `.jpg`, `.gif`, `.webp`) or sounds (`.mp3`, `.wav`, `.ogg`, `.m4a`) into `backend/media/`. The server serves them at `http://<laptop>:8000/media/<name>`, and the host list re-reads the folder on every update, so no restart is needed. Use short names without spaces.
+
+**The two looks and the reveal.** The TV and the captains' phones start in the **quiz look**: a black halftone stage, tilted sticker cards and marker lettering. The bingo and host pages always use the **reveal look**, a 70s game-show set: a dusty-blue wall with red, orange, yellow and maroon stripes, ring medallions, marquee light bulbs at the sides of big screens, a peach floor, rounded arch-like cards, and a buzzer made of nested rings. At the end of the night, press **Reveal the secret bingo** in the bingo panel. The TV plays a "Plot twist! Let's get ready for a Game Changer!" animation for about 7 seconds, and then the TV and the phones switch to the reveal look, so the whole party ends in the bingo game's look. **Back to the quiz look** undoes it, and Reset also goes back to the quiz look. A good order: Close ticking, Apply bingo bonus, play a sound, then Reveal.
+
+How it works: the server keeps `state["theme"]` (`"quiz"` or `"reveal"`), and only the host can change it, with `theme {theme}`. Every page calls `useTheme(...)` (`lib/useTheme.js`), which sets `<html data-theme="...">`. `index.css` defines its colors and fonts as tokens (`--bg`, `--card`, `--accent`, ...) once per theme, so changing the attribute changes the whole look. The fonts come from Google Fonts. Without internet, the pages fall back to system fonts and still work.
 
 **Sound on the TV.** Browsers block sound until the page has been clicked. Click "Click to enable sound" on the TV once after opening it.
 
@@ -299,7 +304,7 @@ def count_lines(marks: list) -> int:
 
 ## 14. Testing
 
-**Unit tests (pytest), 39 tests.** These test `handle()`, `view_for()` and the timer functions directly with plain dicts, so there's no network and no waiting.
+**Unit tests (pytest), 42 tests.** These test `handle()`, `view_for()` and the timer functions directly with plain dicts, so there's no network and no waiting.
 
 ```powershell
 cd backend
@@ -335,7 +340,7 @@ Delete `backend/state.json` and restart the backend before each script. Each one
 
 **The week before**
 
-- [ ] Put the real phrases in `backend/boards.py`: 5 cards (one per team captain), 16 phrases each, and give each card a title.
+- [ ] Replace the "falta" placeholders in `backend/boards.py` (Max 6, Gugin 4). Each card must keep exactly 16 phrases.
 - [ ] Put your images and sounds in `backend/media/`.
 - [ ] Set your own `HOST_PASSWORD`.
 - [ ] Do a dry run on real phones (see below).
@@ -357,7 +362,7 @@ Delete `backend/state.json` and restart the backend before each script. Each one
 4. Bingo players pick their cards whenever they arrive.
 5. Captains scan the QR and create teams. Bingo players then pick their team.
 6. Press **Start game**.
-7. At the end: **Close ticking**, then **Apply bingo bonus**.
+7. At the end: **Close ticking**, then **Apply bingo bonus**, then **Reveal the secret bingo**.
 
 ---
 
@@ -425,7 +430,7 @@ The server stores `release_at` and runs an asyncio task that sleeps until then. 
 Pressing Apply bingo twice gives the same result. The bonus is recalculated from the cards instead of added. Retries and double-clicks become harmless.
 
 **11. How did you test it?**
-39 pytest unit tests call the pure functions (`handle`, `view_for`, `auto_release`) with plain dicts. Passing the time in as an argument means no waiting. Three Playwright scripts drive real browsers at phone size through full games, including the host page and a server restart.
+42 pytest unit tests call the pure functions (`handle`, `view_for`, `auto_release`) with plain dicts. Passing the time in as an argument means no waiting. Three Playwright scripts drive real browsers at phone size through full games, including the host page and a server restart.
 
 **12. What are the limits of this design?**
 State lives in one process's memory, plus a JSON file. It can't run as several server processes, and there's no database or real user accounts. To scale, I'd move the state into Redis or a database with transactions, use pub/sub to tell every server about changes, and add proper authentication.

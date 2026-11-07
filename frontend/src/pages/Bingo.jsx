@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useGame } from "../useGame.js";
 import { clearBoard, loadBoard, saveBoard } from "../lib/savedBoard.js";
+import { useTheme } from "../lib/useTheme.js";
 
 const NEW_PLAYER = { role: "bingo" };    // hello without a board yet
 
 export default function Bingo() {
   const [saved, setSaved] = useState(loadBoard);   // { board_id, token } or null
+  useTheme("reveal");                              // the secret game has its own look
 
   if (!saved) {
     return (
@@ -90,7 +92,8 @@ function BoardGame({ saved, onForget }) {
         </>
       )}
 
-      <div className="card" role="grid" aria-label="Bingo card">
+      {/* lang="es": the phrases are in Spanish, so long words break with Spanish rules */}
+      <div className="card" role="grid" aria-label="Bingo card" lang="es">
         {mine.phrases.map((phrase, i) => (
           <button key={i} type="button" role="gridcell"
             aria-pressed={mine.marks[i]}

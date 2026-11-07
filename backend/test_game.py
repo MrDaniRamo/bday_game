@@ -435,3 +435,26 @@ def test_media_files_are_served_over_http():
     response = TestClient(app).get("/media/test.png")
     assert response.status_code == 200
     assert response.headers["content-type"] == "image/png"
+
+
+# ---------- look: quiz until the host reveals the secret bingo ----------
+def test_theme_starts_as_quiz_and_everyone_sees_it(game):
+    s, a, b, ids = game
+    assert view_for(s, a)["theme"] == "quiz"
+    assert view_for(s, {"id": 99, "role": "display", "team": None, "board": None})["theme"] == "quiz"
+
+
+def test_only_the_host_can_reveal_and_the_value_is_checked(game):
+    s, a, b, ids = game
+    assert handle(s, a, {"type": "theme", "theme": "reveal"}) == "theme is host only"
+    assert handle(s, host(), {"type": "theme", "theme": "disco"}) == "theme must be quiz or reveal"
+    assert handle(s, host(), {"type": "theme", "theme": "reveal"}) is None
+    assert view_for(s, a)["theme"] == "reveal"
+    assert handle(s, host(), {"type": "theme", "theme": "quiz"}) is None   # can go back
+
+
+def test_reset_goes_back_to_the_quiz_look(game):
+    s, a, b, ids = game
+    handle(s, host(), {"type": "theme", "theme": "reveal"})
+    handle(s, host(), {"type": "reset", "password": "party"})
+    assert s["theme"] == "quiz"
