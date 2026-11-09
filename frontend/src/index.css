@@ -273,7 +273,9 @@ header { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
   background: var(--field); color: var(--card-text);
 }
 .card {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem;
+  /* minmax(0, 1fr): columns always share the width equally, even when a long
+     phrase would rather be wider; that square grows taller instead */
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.45rem;
   width: min(100%, 26rem);
 }
 .square {

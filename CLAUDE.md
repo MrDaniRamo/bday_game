@@ -35,7 +35,7 @@ Looks: `quiz` (black stage, sticker cards, marker font) for TV + team phones unt
 then `reveal` (70s game-show set: blue wall, red/orange/yellow/maroon stripes and rings, marquee bulbs); bingo + host always `reveal`. Set by `lib/useTheme.js` as `<html data-theme>`; colors/fonts are tokens in `index.css`.
 TODO:
 - Real phrases are in `backend/boards.py` (cards Max, Oto, Pato, Aldape, Gugin), but some are still "falta"
-  placeholders: Max 6, Gugin 4 (Pato is complete). Replace them when the owner sends the missing phrases.
+  placeholders: Max 5, Gugin 2 (Pato is complete). Replace them when the owner sends the missing phrases.
 - Dry run on real phones over Wi-Fi (see Network below), then the party-day checklist in the guide.
 - The old PDF guides are outdated; `guide/GUIDE.md` replaces them.
 
