@@ -110,7 +110,7 @@ BOARDS = [
             "Corrige a alguien",
             "Osea si...",
             "Pipipipi",
-            "Mi bistec es demasiado jugoso, mi langosta muy matequillosa",
+            "My steak is too juicy, my lobster too buttery",
             "falta4",
             "falta5",
         ],
