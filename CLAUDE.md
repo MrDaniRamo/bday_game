@@ -22,12 +22,12 @@ understand the code (what, why, how to test, interview questions). Build first, 
 4. **Buzzer**: server decides the first buzz (handler is synchronous, no race). After a buzz the buzzers reopen by
    themselves after `AUTO_RELEASE_SECONDS` (default 5); the host can also release/lock manually.
 5. **Secret bingo** (`/bingo`): separate devices, secret. Preset 4x4 cards in `backend/boards.py` (16 phrases/habits of
-   each team's captain). The party has **5 teams**, so there are 5 cards (`b1`..`b5`). One player per card (private token). Player ticks squares; the SERVER counts lines (10 possible).
+   each team's captain). The party has **5 teams**, so there are 5 cards (`b1`..`b5`). Each card's squares are shuffled once per game (`order` in the board, saved; Reset reshuffles). One player per card (private token). Player ticks squares; the SERVER counts lines (10 possible).
    Player picks their team from a drop-down once teams exist. Works before the game starts. At the end the host sends
    `apply_bingo`, which sets each team's `bingo_bonus = lines * POINTS_PER_LINE` (idempotent). Scoreboard total = score + bonus.
 
 ## Status
-DONE and verified (42 pytest tests; Playwright phone tests `e2e.py`, `e2e_bingo.py`, `e2e_host.py`):
+DONE and verified (46 pytest tests; Playwright phone tests `e2e.py`, `e2e_bingo.py`, `e2e_host.py`):
 backend `backend/main.py`, `backend/boards.py`, `backend/test_game.py`; frontend display, team phone, bingo page,
 and the host page (`frontend/src/pages/Host.jsx`: login, start/lobby, buzzers + reopen delay, points, free/remove,
 media from `backend/media/`, bingo panel with apply and reveal, password-confirmed reset). Guide: `guide/GUIDE.md`.

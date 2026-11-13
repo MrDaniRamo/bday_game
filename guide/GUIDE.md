@@ -67,7 +67,7 @@ All four pages are one React app. `frontend/src/main.jsx` picks the page from th
 |---|---|
 | `backend/main.py` | The whole server: state, message handling, views, timer, saving, media |
 | `backend/boards.py` | The preset bingo cards (edit this with your captains' phrases) |
-| `backend/test_game.py` | 42 pytest tests of the game rules |
+| `backend/test_game.py` | 46 pytest tests of the game rules |
 | `backend/media/` | Images and sounds the host can put on the TV |
 | `frontend/src/useGame.js` | The WebSocket hook every page uses |
 | `frontend/src/pages/*.jsx` | Display, Team, Bingo, Host |
@@ -239,6 +239,7 @@ After a buzz, the buzzers reopen by themselves after `auto_release_seconds` (def
 ## 10. Secret bingo scoring
 
 - Cards are preset in `backend/boards.py`: an id, a title and exactly 16 phrases. There are 5 cards, one for each captain: Max, Oto, Pato, Aldape and Gugin. Two squares still say "falta" (Gugin 15 and 16). **Replace those with real phrases before the party.**
+- **Shuffled squares.** When the server creates a game, it shuffles each card once (`order` in `new_board`, made by `random.sample`). The player sees the phrases in that order (`board_phrases`), so the cards don't follow the order of the text files. The order is saved in `state.json`, so a refresh, a server restart or a freed card keeps the same layout, and Reset deals new ones. Ticks are stored by square, not by phrase, so lines count on the card exactly as the player sees it. The order never leaves the server except as the player's own phrase list.
 - Bingo works from the start, before any team exists. The team drop-down fills in as captains create teams.
 - The phone only says "square 5 is ticked". The **server counts the lines**: 4 rows, 4 columns and 2 diagonals.
 
@@ -304,7 +305,7 @@ How it works: the server keeps `state["theme"]` (`"quiz"` or `"reveal"`), and on
 
 ## 14. Testing
 
-**Unit tests (pytest), 42 tests.** These test `handle()`, `view_for()` and the timer functions directly with plain dicts, so there's no network and no waiting.
+**Unit tests (pytest), 46 tests.** These test `handle()`, `view_for()` and the timer functions directly with plain dicts, so there's no network and no waiting.
 
 ```powershell
 cd backend
@@ -430,7 +431,7 @@ The server stores `release_at` and runs an asyncio task that sleeps until then. 
 Pressing Apply bingo twice gives the same result. The bonus is recalculated from the cards instead of added. Retries and double-clicks become harmless.
 
 **11. How did you test it?**
-42 pytest unit tests call the pure functions (`handle`, `view_for`, `auto_release`) with plain dicts. Passing the time in as an argument means no waiting. Three Playwright scripts drive real browsers at phone size through full games, including the host page and a server restart.
+46 pytest unit tests call the pure functions (`handle`, `view_for`, `auto_release`) with plain dicts. Passing the time in as an argument means no waiting. Three Playwright scripts drive real browsers at phone size through full games, including the host page and a server restart.
 
 **12. What are the limits of this design?**
 State lives in one process's memory, plus a JSON file. It can't run as several server processes, and there's no database or real user accounts. To scale, I'd move the state into Redis or a database with transactions, use pub/sub to tell every server about changes, and add proper authentication.

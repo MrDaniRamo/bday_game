@@ -458,3 +458,36 @@ def test_reset_goes_back_to_the_quiz_look(game):
     handle(s, host(), {"type": "theme", "theme": "reveal"})
     handle(s, host(), {"type": "reset", "password": "party"})
     assert s["theme"] == "quiz"
+
+
+# ---------- shuffled cards ----------
+def test_each_card_gets_a_shuffled_order_of_all_16_phrases():
+    s = new_state()
+    for board in s["boards"].values():
+        assert sorted(board["order"]) == list(range(16))     # every phrase once
+
+
+def test_the_player_sees_the_phrases_in_the_shuffled_order():
+    from boards import BOARDS
+    s = new_state()
+    s["boards"]["b1"]["order"] = list(reversed(range(16)))   # a known shuffle
+    c = bingo_phone()
+    pick(s, c, "b1")
+    shown = view_for(s, c)["my_board"]["phrases"]
+    assert shown == list(reversed(BOARDS[0]["phrases"]))
+
+
+def test_lines_count_on_the_squares_as_shown_not_the_original_order():
+    s = new_state()
+    s["boards"]["b1"]["order"] = list(reversed(range(16)))
+    c = bingo_phone()
+    pick(s, c, "b1")
+    tick(s, c, [0, 1, 2, 3])                                 # the top row on screen
+    assert view_for(s, c)["my_board"]["lines"] == 1
+
+
+def test_the_order_never_reaches_other_roles(game):
+    s, a, b, ids = game
+    display = {"id": 77, "role": "display", "team": None, "board": None}
+    for conn in (a, display, host(), bingo_phone()):
+        assert '"order"' not in json.dumps(view_for(s, conn))

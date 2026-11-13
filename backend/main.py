@@ -102,13 +102,28 @@ def new_team(name: str = "", color: str = TEAM_COLORS[0]) -> dict:
     }
 
 
+def shuffled_order() -> list[int]:
+    """A random order for a card's 16 phrases: order[square] = phrase number."""
+    return random.sample(range(16), 16)
+
+
 def new_board() -> dict:
     return {
         "claimed": False,          # True while a player owns the board
         "token": None,             # PRIVATE: the player's secret, like a captain's
         "marks": [False] * 16,     # PRIVATE: which squares the player ticked
         "team": None,              # the team id the player picked in the dropdown
+        # Shuffled once per game, so every party gets a fresh layout, but a refresh
+        # or a server restart keeps it. Marks are by SQUARE, so lines still count
+        # on the card exactly as the player sees it.
+        "order": shuffled_order(),
     }
+
+
+def board_phrases(board_id: str, board: dict) -> list[str]:
+    """The card's phrases in the order they appear on its 16 squares."""
+    phrases = board_info(board_id)["phrases"]
+    return [phrases[i] for i in board["order"]]
 
 
 def count_lines(marks: list) -> int:
@@ -255,7 +270,7 @@ def view_for(state: dict, conn: dict) -> dict:
         b = state["boards"][conn["board"]]
         view["my_board"] = {
             "id": conn["board"], "title": board_info(conn["board"])["title"],
-            "phrases": board_info(conn["board"])["phrases"],
+            "phrases": board_phrases(conn["board"], b),
             "marks": b["marks"], "lines": count_lines(b["marks"]),
             "team": b["team"], "controller": b.get("session") == conn["id"],
         }
@@ -589,6 +604,8 @@ def load_state() -> None:
             log.warning("state.json is from an older version; starting fresh")
             return
         state.update(data)
+        for board in state["boards"].values():    # a save from before shuffling
+            board.setdefault("order", shuffled_order())
         log.info("Loaded state (%d teams)", len(state["teams"]))
     except FileNotFoundError:
         pass
