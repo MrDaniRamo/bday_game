@@ -22,24 +22,27 @@ understand the code (what, why, how to test, interview questions). Build first, 
 4. **Buzzer**: server decides the first buzz (handler is synchronous, no race). After a buzz the buzzers reopen by
    themselves after `AUTO_RELEASE_SECONDS` (default 5); the host can also release/lock manually.
 5. **Secret bingo** (`/bingo`): separate devices, secret. Preset 4x4 cards in `backend/boards.py` (16 phrases/habits of
-   each team's captain). The party has **5 teams**, so there are 5 cards (`b1`..`b5`). One player per card (private token). Player ticks squares; the SERVER counts lines (10 possible).
+   each team's captain). The party has **5 teams**, so there are 5 cards (`b1`..`b5`). Each card's squares are shuffled once per game (`order` in the board, saved; Reset reshuffles). One player per card (private token). Player ticks squares; the SERVER counts lines (10 possible).
    Player picks their team from a drop-down once teams exist. Works before the game starts. At the end the host sends
    `apply_bingo`, which sets each team's `bingo_bonus = lines * POINTS_PER_LINE` (idempotent). Scoreboard total = score + bonus.
 
 ## Status
-DONE and verified (39 pytest tests; Playwright phone tests `e2e.py`, `e2e_bingo.py`, `e2e_host.py`):
+DONE and verified (46 pytest tests; Playwright phone tests `e2e.py`, `e2e_bingo.py`, `e2e_host.py`):
 backend `backend/main.py`, `backend/boards.py`, `backend/test_game.py`; frontend display, team phone, bingo page,
 and the host page (`frontend/src/pages/Host.jsx`: login, start/lobby, buzzers + reopen delay, points, free/remove,
-media from `backend/media/`, bingo panel with apply, password-confirmed reset). Guide: `guide/GUIDE.md`.
+media from `backend/media/`, bingo panel with apply and reveal, password-confirmed reset). Guide: `guide/GUIDE.md`.
+Looks: `quiz` (black stage, sticker cards, marker font) for TV + team phones until the host reveals the bingo,
+then `reveal` (70s game-show set: blue wall, red/orange/yellow/maroon stripes and rings, marquee bulbs); bingo + host always `reveal`. Set by `lib/useTheme.js` as `<html data-theme>`; colors/fonts are tokens in `index.css`.
 TODO:
-- Put the real captain phrases in `backend/boards.py` (owner provides them).
+- Real phrases are in `backend/boards.py` (cards Max, Oto, Pato, Aldape, Gugin), but some are still "falta"
+  placeholders: Gugin 2 (Max, Oto, Pato and Aldape are complete). Replace them when the owner sends the missing phrases.
 - Dry run on real phones over Wi-Fi (see Network below), then the party-day checklist in the guide.
 - The old PDF guides are outdated; `guide/GUIDE.md` replaces them.
 
 ## Message protocol (JSON over WebSocket `/ws`, shape `{"type": ..., ...}`)
 hello{role: display|team|bingo|host, ...}; team: claim{name,color | team_id}, team_edit{name,color}, buzz;
 host: phase, release, lock, points{team(id),delta}, media, auto_release{seconds}, free_team, remove_team,
-bingo_open, bingo_free, apply_bingo, reset{password}; bingo: bingo_pick{board_id}, bingo_mark{index,marked}, bingo_team{team_id}.
+bingo_open, bingo_free, apply_bingo, reset{password}, theme{theme: quiz|reveal}; bingo: bingo_pick{board_id}, bingo_mark{index,marked}, bingo_team{team_id}.
 Server replies: `state` (per-role filtered view), `error{detail}` (sender only), private `claimed` / `board_claimed` with a token.
 Teams are keyed by id (`t1`, `t2`...), not name. Game state is saved to `backend/state.json` (delete it, or use the host Reset, to start fresh).
 Media: files in `backend/media/` are served at `:8000/media/<name>`; the host view lists them as `media_files`.

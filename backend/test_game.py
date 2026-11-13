@@ -435,3 +435,59 @@ def test_media_files_are_served_over_http():
     response = TestClient(app).get("/media/test.png")
     assert response.status_code == 200
     assert response.headers["content-type"] == "image/png"
+
+
+# ---------- look: quiz until the host reveals the secret bingo ----------
+def test_theme_starts_as_quiz_and_everyone_sees_it(game):
+    s, a, b, ids = game
+    assert view_for(s, a)["theme"] == "quiz"
+    assert view_for(s, {"id": 99, "role": "display", "team": None, "board": None})["theme"] == "quiz"
+
+
+def test_only_the_host_can_reveal_and_the_value_is_checked(game):
+    s, a, b, ids = game
+    assert handle(s, a, {"type": "theme", "theme": "reveal"}) == "theme is host only"
+    assert handle(s, host(), {"type": "theme", "theme": "disco"}) == "theme must be quiz or reveal"
+    assert handle(s, host(), {"type": "theme", "theme": "reveal"}) is None
+    assert view_for(s, a)["theme"] == "reveal"
+    assert handle(s, host(), {"type": "theme", "theme": "quiz"}) is None   # can go back
+
+
+def test_reset_goes_back_to_the_quiz_look(game):
+    s, a, b, ids = game
+    handle(s, host(), {"type": "theme", "theme": "reveal"})
+    handle(s, host(), {"type": "reset", "password": "party"})
+    assert s["theme"] == "quiz"
+
+
+# ---------- shuffled cards ----------
+def test_each_card_gets_a_shuffled_order_of_all_16_phrases():
+    s = new_state()
+    for board in s["boards"].values():
+        assert sorted(board["order"]) == list(range(16))     # every phrase once
+
+
+def test_the_player_sees_the_phrases_in_the_shuffled_order():
+    from boards import BOARDS
+    s = new_state()
+    s["boards"]["b1"]["order"] = list(reversed(range(16)))   # a known shuffle
+    c = bingo_phone()
+    pick(s, c, "b1")
+    shown = view_for(s, c)["my_board"]["phrases"]
+    assert shown == list(reversed(BOARDS[0]["phrases"]))
+
+
+def test_lines_count_on_the_squares_as_shown_not_the_original_order():
+    s = new_state()
+    s["boards"]["b1"]["order"] = list(reversed(range(16)))
+    c = bingo_phone()
+    pick(s, c, "b1")
+    tick(s, c, [0, 1, 2, 3])                                 # the top row on screen
+    assert view_for(s, c)["my_board"]["lines"] == 1
+
+
+def test_the_order_never_reaches_other_roles(game):
+    s, a, b, ids = game
+    display = {"id": 77, "role": "display", "team": None, "board": None}
+    for conn in (a, display, host(), bingo_phone()):
+        assert '"order"' not in json.dumps(view_for(s, conn))
