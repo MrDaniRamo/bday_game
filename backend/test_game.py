@@ -424,7 +424,8 @@ def test_reset_starts_a_fresh_game_in_the_same_dict(game):
 def test_only_the_host_view_lists_media_files(game):
     s, a, b, ids = game
     files = view_for(s, host())["media_files"]
-    assert {"name": "test.png", "type": "image", "src": "/media/test.png"} in files
+    assert {"name": "test.png", "type": "image", "src": "/media/test.png",
+            "question": "test", "part": None} in files
     assert all(f["type"] in ("image", "sound") for f in files)
     assert "media_files" not in view_for(s, a)
 
@@ -491,3 +492,30 @@ def test_the_order_never_reaches_other_roles(game):
     display = {"id": 77, "role": "display", "team": None, "board": None}
     for conn in (a, display, host(), bingo_phone()):
         assert '"order"' not in json.dumps(view_for(s, conn))
+
+
+# ---------- media grouped by question ----------
+def test_file_names_split_into_question_and_part():
+    from main import media_question
+    assert media_question("bonus2_3") == ("bonus2", 3)
+    assert media_question("bonus3") == ("bonus3", None)
+    assert media_question("final_round") == ("final_round", None)   # not a number
+
+
+def test_media_parts_are_listed_in_order(tmp_path, monkeypatch):
+    import main
+    for name in ("q1_10.png", "q1_2.png", "q1_1.png", "intro.mp3"):
+        (tmp_path / name).write_bytes(b"x")
+    (tmp_path / "notes.txt").write_text("not media")
+    monkeypatch.setattr(main, "MEDIA_DIR", tmp_path)
+    names = [m["name"] for m in main.list_media()]
+    assert names == ["intro.mp3", "q1_1.png", "q1_2.png", "q1_10.png"]
+
+
+def test_the_trivia_images_are_in_the_media_folder():
+    import main
+    by_name = {m["name"]: m for m in main.list_media()}
+    for part in (1, 2, 3, 4):
+        match = [m for m in by_name.values() if m["question"] == "bonus2" and m["part"] == part]
+        assert len(match) == 1 and match[0]["type"] == "image"
+    assert by_name["bonus3.png"]["question"] == "bonus3"

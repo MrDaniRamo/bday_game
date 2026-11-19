@@ -215,15 +215,31 @@ def board_info(board_id: str) -> dict:
     return next(b for b in BOARDS if b["id"] == board_id)
 
 
+def media_question(stem: str) -> tuple[str, int | None]:
+    """Split a file name (without extension) into its question and part number.
+
+    "bonus2_3" -> ("bonus2", 3): part 3 of the question "bonus2".
+    "bonus3"   -> ("bonus3", None): a question with a single file.
+    """
+    question, _, part = stem.rpartition("_")
+    if question and part.isdigit():
+        return question, int(part)
+    return stem, None
+
+
 def list_media() -> list[dict]:
     """The images and sounds in the media folder, for the host's media panel.
 
     Read from disk every time, so a file you drop in shows up without a restart.
+    Sorted by question, then part number, so bonus2_10 comes after bonus2_9.
     """
-    return [{"name": f.name, "type": MEDIA_TYPES[f.suffix.lower()],
-             "src": f"/media/{f.name}"}
-            for f in sorted(MEDIA_DIR.iterdir())
-            if f.is_file() and f.suffix.lower() in MEDIA_TYPES]
+    files = []
+    for f in MEDIA_DIR.iterdir():
+        if f.is_file() and f.suffix.lower() in MEDIA_TYPES:
+            question, part = media_question(f.stem)
+            files.append({"name": f.name, "type": MEDIA_TYPES[f.suffix.lower()],
+                          "src": f"/media/{f.name}", "question": question, "part": part})
+    return sorted(files, key=lambda m: (m["question"], m["part"] or 0, m["name"]))
 
 
 def public_team(t: dict) -> dict:
