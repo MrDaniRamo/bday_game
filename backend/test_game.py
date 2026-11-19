@@ -424,8 +424,8 @@ def test_reset_starts_a_fresh_game_in_the_same_dict(game):
 def test_only_the_host_view_lists_media_files(game):
     s, a, b, ids = game
     files = view_for(s, host())["media_files"]
-    assert {"name": "test.png", "type": "image", "src": "/media/test.png",
-            "question": "test", "part": None} in files
+    assert {"name": "bonus3.png", "type": "image", "src": "/media/bonus3.png",
+            "question": "bonus3", "part": None} in files
     assert all(f["type"] in ("image", "sound") for f in files)
     assert "media_files" not in view_for(s, a)
 
@@ -433,7 +433,7 @@ def test_only_the_host_view_lists_media_files(game):
 def test_media_files_are_served_over_http():
     from fastapi.testclient import TestClient
     from main import app
-    response = TestClient(app).get("/media/test.png")
+    response = TestClient(app).get("/media/bonus3.png")
     assert response.status_code == 200
     assert response.headers["content-type"] == "image/png"
 
@@ -515,7 +515,7 @@ def test_media_parts_are_listed_in_order(tmp_path, monkeypatch):
 def test_the_trivia_images_are_in_the_media_folder():
     import main
     by_name = {m["name"]: m for m in main.list_media()}
-    for part in (1, 2, 3, 4):
+    for part in (1, 2, 3, 4, 5):
         match = [m for m in by_name.values() if m["question"] == "bonus2" and m["part"] == part]
         assert len(match) == 1 and match[0]["type"] == "image"
     assert by_name["bonus3.png"]["question"] == "bonus3"

@@ -46,7 +46,7 @@ bingo_open, bingo_free, apply_bingo, reset{password}, theme{theme: quiz|reveal};
 Server replies: `state` (per-role filtered view), `error{detail}` (sender only), private `claimed` / `board_claimed` with a token.
 Teams are keyed by id (`t1`, `t2`...), not name. Game state is saved to `backend/state.json` (delete it, or use the host Reset, to start fresh).
 Media: files in `backend/media/` are served at `:8000/media/<name>`; the host view lists them as `media_files`,
-grouped by question: `bonus2_1..4` are parts of one question (`question`/`part` fields), `bonus3.png` is its own.
+grouped by question: `bonus2_1..5` are parts of one question (`question`/`part` fields), `bonus3.png` is its own.
 
 ## Commands
 Backend (from `backend/`, virtual env active): `python -m pip install -r requirements.txt`,

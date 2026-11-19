@@ -58,11 +58,12 @@ with sync_playwright() as p:
     ok("points show on the TV", T.inner_text(".score") == "9")
 
     # --- media ---
-    H.click(".files li:has-text('test.png') button"); D.wait_for_selector(".media img")
+    H.click(".files li:has-text('bonus3.png') button"); D.wait_for_selector(".media img")
     D.wait_for_function("document.querySelector('.media img').naturalWidth > 0")
     ok("image from backend/media loads on the TV", True)
     H.screenshot(path="v_host_laptop.png", full_page=True); D.screenshot(path="v_display_media.png")
-    H.click(".files li:has-text('test.wav') button"); wait_text(H, "On the TV: sound /media/test.wav")
+    H.fill("#media-url", "https://example.com/cheer.mp3"); H.click("text=Send")
+    wait_text(H, "On the TV: sound https://example.com/cheer.mp3")
     ok("sound sent (and the image is gone)", D.locator(".media img").count() == 0)
     H.click("text=Clear the screen"); wait_text(H, "On the TV: nothing"); ok("clear the screen", True)
 
