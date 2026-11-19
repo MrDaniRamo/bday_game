@@ -5,6 +5,7 @@ import BuzzerButton from "../components/BuzzerButton.jsx";
 import ColorPicker from "../components/ColorPicker.jsx";
 import { buzzerStatus } from "../lib/buzzer.js";
 import { clearTeam, loadTeam, saveTeam } from "../lib/savedTeam.js";
+import { useTheme } from "../lib/useTheme.js";
 
 const MAX_TEAM_NAME = 24;               // same limit as the server
 const NEW_PHONE = { role: "team" };     // hello without a team yet
@@ -72,6 +73,7 @@ function JoinScreen({ onClaimed }) {
   const { state, error, send } = useGame(NEW_PHONE, (msg) => {
     if (msg.type === "claimed") onClaimed(msg.team_id, msg.token);
   });
+  useTheme(state?.theme ?? "quiz");
 
   if (!state) return <main className="screen"><p className="hint">Connecting…</p></main>;
 
@@ -115,6 +117,7 @@ function TeamGame({ saved, onForget }) {
   const identity = { role: "team", ...saved };
   const { state, connected, error, send, clearError } = useGame(identity);
   const seconds = useCountdown(state?.release_in);   // hooks go before any early return
+  useTheme(state?.theme ?? "quiz");
 
   // The token is no good: refused at hello, or the host freed/removed our team.
   const myId = state?.you?.team;

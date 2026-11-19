@@ -28,7 +28,7 @@ from boards import BOARDS
 HOST_PASSWORD = os.environ.get("HOST_PASSWORD", "party")
 HOST_ONLY = {"release", "lock", "points", "media", "auto_release",
              "phase", "free_team", "remove_team",
-             "bingo_open", "bingo_free", "apply_bingo", "reset"}
+             "bingo_open", "bingo_free", "apply_bingo", "reset", "theme"}
 # Bonus points for each completed bingo line, added when the host applies bingo.
 POINTS_PER_LINE = int(os.environ.get("POINTS_PER_LINE", "10"))
 # The 10 winning lines on a 4x4 card, as square numbers 0..15 (row by row).
@@ -42,6 +42,9 @@ TEAM_COLORS = ["#ff3d7f", "#ffc63d", "#2bd9a8", "#4da3ff",
                "#b57bff", "#ff8a3d", "#7be0ff", "#c8e64c"]
 # Seconds after a buzz before the buzzers reopen by themselves (0 = the host does it).
 AUTO_RELEASE_SECONDS = float(os.environ.get("AUTO_RELEASE_SECONDS", "5"))
+# The look of the TV and captain phones: "quiz" all night, "reveal" after the
+# host reveals the secret bingo. Bingo and host pages always use the reveal look.
+THEMES = ("quiz", "reveal")
 STATE_FILE = "state.json"
 # Images and sounds the host can put on the TV. Drop files into backend/media/.
 MEDIA_DIR = Path(__file__).parent / "media"
@@ -99,13 +102,28 @@ def new_team(name: str = "", color: str = TEAM_COLORS[0]) -> dict:
     }
 
 
+def shuffled_order() -> list[int]:
+    """A random order for a card's 16 phrases: order[square] = phrase number."""
+    return random.sample(range(16), 16)
+
+
 def new_board() -> dict:
     return {
         "claimed": False,          # True while a player owns the board
         "token": None,             # PRIVATE: the player's secret, like a captain's
         "marks": [False] * 16,     # PRIVATE: which squares the player ticked
         "team": None,              # the team id the player picked in the dropdown
+        # Shuffled once per game, so every party gets a fresh layout, but a refresh
+        # or a server restart keeps it. Marks are by SQUARE, so lines still count
+        # on the card exactly as the player sees it.
+        "order": shuffled_order(),
     }
+
+
+def board_phrases(board_id: str, board: dict) -> list[str]:
+    """The card's phrases in the order they appear on its 16 squares."""
+    phrases = board_info(board_id)["phrases"]
+    return [phrases[i] for i in board["order"]]
 
 
 def count_lines(marks: list) -> int:
@@ -116,6 +134,7 @@ def count_lines(marks: list) -> int:
 def new_state() -> dict:
     return {
         "phase": "lobby",            # "lobby" (teams join and edit) or "playing"
+        "theme": "quiz",             # look of the TV and phones, one of THEMES
         "next_id": 1,                # teams are keyed by an id like "t1", never by name
         "teams": {},                 # team id -> new_team()
         "buzzers_open": False,       # True while teams may buzz
@@ -233,6 +252,7 @@ def view_for(state: dict, conn: dict) -> dict:
                 "points_per_line": POINTS_PER_LINE}
     view = {
         "phase": state["phase"],
+        "theme": state["theme"],
         "colors": TEAM_COLORS,          # the palette: phones need no copy of it
         "teams": {tid: public_team(t) for tid, t in state["teams"].items()},
         "buzzers_open": state["buzzers_open"],
@@ -250,7 +270,7 @@ def view_for(state: dict, conn: dict) -> dict:
         b = state["boards"][conn["board"]]
         view["my_board"] = {
             "id": conn["board"], "title": board_info(conn["board"])["title"],
-            "phrases": board_info(conn["board"])["phrases"],
+            "phrases": board_phrases(conn["board"], b),
             "marks": b["marks"], "lines": count_lines(b["marks"]),
             "team": b["team"], "controller": b.get("session") == conn["id"],
         }
@@ -454,6 +474,10 @@ def handle(state: dict, conn: dict, msg: dict) -> str | None:
         board.update(claimed=False, token=None, session=None)
     elif kind == "apply_bingo":
         apply_bingo(state)
+    elif kind == "theme":
+        if msg.get("theme") not in THEMES:
+            return "theme must be quiz or reveal"
+        state["theme"] = msg["theme"]
     elif kind == "reset":
         # Wipes teams, scores and bingo cards. The host types the password again
         # as a "are you sure?" check, so a stray click cannot end the party.
@@ -580,6 +604,8 @@ def load_state() -> None:
             log.warning("state.json is from an older version; starting fresh")
             return
         state.update(data)
+        for board in state["boards"].values():    # a save from before shuffling
+            board.setdefault("order", shuffled_order())
         log.info("Loaded state (%d teams)", len(state["teams"]))
     except FileNotFoundError:
         pass

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGame } from "../useGame.js";
 import { useCountdown } from "../lib/useCountdown.js";
+import { useTheme } from "../lib/useTheme.js";
 
 // The host's control panel. Everything here only SENDS requests: the server
 // checks the password on every connection and decides what actually happens.
@@ -28,6 +29,7 @@ function savePassword(password) {
 export default function Host() {
   const [password, setPassword] = useState(loadPassword);
   const [loginError, setLoginError] = useState(null);
+  useTheme("reveal");                    // the host page always uses the reveal look
 
   if (!password) {
     return (
@@ -314,7 +316,36 @@ function BingoPanel({ state, act }) {
         </button>
         <span className="hint">Safe to press twice: it recalculates, it never adds twice.</span>
       </div>
+      <RevealControl state={state} act={act} />
     </section>
+  );
+}
+
+// Switches the TV and captain phones from the quiz look to the reveal look.
+function RevealControl({ state, act }) {
+  const revealed = state.theme === "reveal";
+  return (
+    <div className="reveal-control">
+      <p className="now">
+        TV look: {revealed ? "revealed (bingo look)" : "quiz look (bingo is still secret)"}
+      </p>
+      <div className="row">
+        {revealed ? (
+          <button onClick={() => act({ type: "theme", theme: "quiz" })}>
+            Back to the quiz look
+          </button>
+        ) : (
+          <button className="go" onClick={() => {
+            if (confirm("Reveal the secret bingo? The TV plays the plot twist and changes look.")) {
+              act({ type: "theme", theme: "reveal" });
+            }
+          }}>
+            Reveal the secret bingo
+          </button>
+        )}
+      </div>
+      <p className="hint">Tip: close ticking and apply the bonus first, then reveal.</p>
+    </div>
   );
 }
 
