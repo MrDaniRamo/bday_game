@@ -27,7 +27,7 @@ understand the code (what, why, how to test, interview questions). Build first, 
    `apply_bingo`, which sets each team's `bingo_bonus = lines * POINTS_PER_LINE` (idempotent). Scoreboard total = score + bonus.
 
 ## Status
-DONE and verified (46 pytest tests; Playwright phone tests `e2e.py`, `e2e_bingo.py`, `e2e_host.py`):
+DONE and verified (49 pytest tests; Playwright phone tests `e2e.py`, `e2e_bingo.py`, `e2e_host.py`):
 backend `backend/main.py`, `backend/boards.py`, `backend/test_game.py`; frontend display, team phone, bingo page,
 and the host page (`frontend/src/pages/Host.jsx`: login, start/lobby, buzzers + reopen delay, points, free/remove,
 media from `backend/media/`, bingo panel with apply and reveal, password-confirmed reset). Guide: `guide/GUIDE.md`.
@@ -45,7 +45,8 @@ host: phase, release, lock, points{team(id),delta}, media, auto_release{seconds}
 bingo_open, bingo_free, apply_bingo, reset{password}, theme{theme: quiz|reveal}; bingo: bingo_pick{board_id}, bingo_mark{index,marked}, bingo_team{team_id}.
 Server replies: `state` (per-role filtered view), `error{detail}` (sender only), private `claimed` / `board_claimed` with a token.
 Teams are keyed by id (`t1`, `t2`...), not name. Game state is saved to `backend/state.json` (delete it, or use the host Reset, to start fresh).
-Media: files in `backend/media/` are served at `:8000/media/<name>`; the host view lists them as `media_files`.
+Media: files in `backend/media/` are served at `:8000/media/<name>`; the host view lists them as `media_files`,
+grouped by question: `bonus2_1..5` are parts of one question (`question`/`part` fields), `bonus3.png` is its own.
 
 ## Commands
 Backend (from `backend/`, virtual env active): `python -m pip install -r requirements.txt`,
