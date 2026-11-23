@@ -238,7 +238,7 @@ After a buzz, the buzzers reopen by themselves after `auto_release_seconds` (def
 
 ## 10. Secret bingo scoring
 
-- Cards are preset in `backend/boards.py`: an id, a title and exactly 16 phrases. There are 5 cards, one for each captain: Max, Oto, Pato, Aldape and Gugin. Two squares still say "falta" (Gugin 15 and 16). **Replace those with real phrases before the party.**
+- Cards are preset in `backend/boards.py`: an id, a title and exactly 16 phrases. There are 5 cards, one for each captain: Max, Oto, Pato, Aldape and Gugin. All 16 phrases on every card are real. To change one, edit its text in that file and keep exactly 16 per card.
 - **Shuffled squares.** When the server creates a game, it shuffles each card once (`order` in `new_board`, made by `random.sample`). The player sees the phrases in that order (`board_phrases`), so the cards don't follow the order of the text files. The order is saved in `state.json`, so a refresh, a server restart or a freed card keeps the same layout, and Reset deals new ones. Ticks are stored by square, not by phrase, so lines count on the card exactly as the player sees it. The order never leaves the server except as the player's own phrase list.
 - Bingo works from the start, before any team exists. The team drop-down fills in as captains create teams.
 - The phone only says "square 5 is ticked". The **server counts the lines**: 4 rows, 4 columns and 2 diagonals.
@@ -343,7 +343,7 @@ Delete `backend/state.json` and restart the backend before each script. Each one
 
 **The week before**
 
-- [ ] Replace the "falta" placeholders in `backend/boards.py` (Gugin 2). Each card must keep exactly 16 phrases.
+- [ ] Read the 5 cards in `backend/boards.py` once more for typos. Each card must keep exactly 16 phrases.
 - [ ] Put your images and sounds in `backend/media/`.
 - [ ] Set your own `HOST_PASSWORD`.
 - [ ] Do a dry run on real phones (see below).

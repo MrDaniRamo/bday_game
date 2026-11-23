@@ -34,8 +34,7 @@ media from `backend/media/`, bingo panel with apply and reveal, password-confirm
 Looks: `quiz` (black stage, sticker cards, marker font) for TV + team phones until the host reveals the bingo,
 then `reveal` (70s game-show set: blue wall, red/orange/yellow/maroon stripes and rings, marquee bulbs); bingo + host always `reveal`. Set by `lib/useTheme.js` as `<html data-theme>`; colors/fonts are tokens in `index.css`.
 TODO:
-- Real phrases are in `backend/boards.py` (cards Max, Oto, Pato, Aldape, Gugin), but some are still "falta"
-  placeholders: Gugin 2 (Max, Oto, Pato and Aldape are complete). Replace them when the owner sends the missing phrases.
+- All 5 cards in `backend/boards.py` (Max, Oto, Pato, Aldape, Gugin) have their 16 real phrases.
 - Dry run on real phones over Wi-Fi (see Network below), then the party-day checklist in the guide.
 - The old PDF guides are outdated; `guide/GUIDE.md` replaces them.
 

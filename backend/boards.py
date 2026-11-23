@@ -1,8 +1,8 @@
 """The preset bingo boards: one per team captain (5 teams = 5 boards).
 
-Each board has 16 phrases or habits of that captain. The server shows them in
-this order as a 4x4 grid (4 per row), so keep exactly 16 per board.
-Entries still marked "falta" are placeholders waiting for a real phrase.
+Each board has 16 phrases or habits of that captain, shown as a 4x4 grid.
+The server shuffles each card once per game (see new_board in main.py), so the
+order here does not matter. Keep exactly 16 per board.
 """
 BOARDS = [
     {
@@ -66,7 +66,7 @@ BOARDS = [
             "Corrige a alguien",
             "Dice que se quiere matar",
             "Menciona Fortnite",
-            "Menciona Discord",
+            "Menciona token/skin de miku dorada",
             "Jotea",
             "Insulto con al menos 4 adjetivos",
         ],
@@ -111,8 +111,8 @@ BOARDS = [
             "Osea si...",
             "Pipipipi",
             "My steak is too juicy, my lobster too buttery",
-            "falta4",
-            "falta5",
+            "Menea su manita al hablar",
+            "Dice amico/amigo",
         ],
     },
 ]
