@@ -1,9 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// Use the same host name the page was loaded from, so phones on your network
-// find the server too (localhost would point at the phone itself).
-export const SERVER_URL = `http://${window.location.hostname}:8000`;
-const WS_URL = `ws://${window.location.hostname}:8000/ws`;
+// Where the game server is.
+// - Built pages (npm run build) are served BY the game server, so it is simply
+//   the address this page came from: http://192.168.1.23:8000, or a tunnel's
+//   https://something.trycloudflare.com. Secure pages must use wss://.
+// - In development (npm run dev) Vite serves the pages on port 5173, and the
+//   game server is on port 8000 of the same machine.
+const { protocol, hostname, host } = window.location;
+const SERVER_HOST = import.meta.env.DEV ? `${hostname}:8000` : host;
+const SECURE = protocol === "https:";
+export const SERVER_URL = `${SECURE ? "https" : "http"}://${SERVER_HOST}`;
+const WS_URL = `${SECURE ? "wss" : "ws"}://${SERVER_HOST}/ws`;
 
 // Media paths like "/media/cheer.mp3" live on the backend, not on Vite.
 export function mediaUrl(src) {

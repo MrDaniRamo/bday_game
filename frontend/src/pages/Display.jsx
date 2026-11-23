@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useGame } from "../useGame.js";
+import { SERVER_URL, useGame } from "../useGame.js";
 import { useCountdown } from "../lib/useCountdown.js";
 import { useTheme } from "../lib/useTheme.js";
 import Scoreboard from "../components/Scoreboard.jsx";
@@ -49,9 +49,12 @@ export default function Display() {
       <p className={state.buzzed ? "status buzzed" : "status"}>{status}</p>
       {seconds !== null && <p className="countdown">Buzzers reopen in {seconds}</p>}
 
-      {/* With an image up, a wide TV shows it BESIDE the scores so all teams stay visible. */}
-      <div className={state.media?.type === "image" ? "arena with-media" : "arena"}>
-        <MediaLayer media={state.media} audioReady={audioReady} />
+      {/* With an image up (or the join code in the lobby), a wide TV shows it
+          BESIDE the scores so all teams stay visible. */}
+      <div className={state.media?.type === "image" || lobby ? "arena with-media" : "arena"}>
+        {lobby && state.media?.type !== "image"
+          ? <JoinCode />
+          : <MediaLayer media={state.media} audioReady={audioReady} />}
         <Scoreboard teams={state.teams} buzzed={state.buzzed} />
       </div>
 
@@ -85,4 +88,21 @@ function useRevealMoment(theme) {
   }, [theme]);
 
   return revealing;
+}
+
+// "Scan to join": a QR code for the team page, at the SAME address this TV page
+// was opened with. Open the TV with the tunnel link and the code is the tunnel
+// link; open it with the laptop's Wi-Fi address and it is that address.
+function JoinCode() {
+  const joinUrl = `${window.location.origin}/team`;
+  const qr = `${SERVER_URL}/qr.svg?data=${encodeURIComponent(joinUrl)}`;
+  return (
+    <figure className="join-code">
+      <img src={qr} alt={`QR code for ${joinUrl}`} />
+      <figcaption>
+        <strong>Captains: scan to join</strong>
+        <span>{joinUrl.replace(/^https?:\/\//, "")}</span>
+      </figcaption>
+    </figure>
+  );
 }

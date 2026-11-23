@@ -176,6 +176,17 @@ header { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
   transition: background 0.2s, transform 0.2s;
 }
 .board .name { overflow-wrap: anywhere; }
+
+/* the lobby's "scan to join" code */
+.join-code { margin: 0; display: grid; justify-items: center; gap: 0.8rem; text-align: center; }
+.join-code img {
+  width: min(100%, calc(100vh - 22rem), 26rem); aspect-ratio: 1;
+  padding: 0.6rem; background: #fff; border: 0.3rem solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--pop);
+}
+.join-code figcaption { display: grid; gap: 0.2rem; }
+.join-code strong { font-family: var(--font-head); font-size: clamp(1.2rem, 2.6vw, 2.2rem); color: var(--accent); }
+.join-code span { font-size: clamp(0.9rem, 1.4vw, 1.3rem); opacity: 0.85; overflow-wrap: anywhere; }
 .board li.lit { background: var(--accent); transform: scale(1.03); animation: buzz-in 0.5s ease-out; }
 
 /* the score sits in a dark "display panel" on the podium */

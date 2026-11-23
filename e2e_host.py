@@ -6,7 +6,7 @@ Run from the project root: python e2e_host.py
 import os, time
 from playwright.sync_api import sync_playwright
 
-URL = "http://localhost:5173"
+URL = os.environ.get("GAME_URL", "http://localhost:5173")  # built pages: http://localhost:8000
 PHONE = {"viewport": {"width": 390, "height": 760}, "device_scale_factor": 1, "is_mobile": True, "has_touch": True}
 LAPTOP = {"viewport": {"width": 1280, "height": 900}}
 

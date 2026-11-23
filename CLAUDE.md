@@ -27,7 +27,7 @@ understand the code (what, why, how to test, interview questions). Build first, 
    `apply_bingo`, which sets each team's `bingo_bonus = lines * POINTS_PER_LINE` (idempotent). Scoreboard total = score + bonus.
 
 ## Status
-DONE and verified (49 pytest tests; Playwright phone tests `e2e.py`, `e2e_bingo.py`, `e2e_host.py`):
+DONE and verified (53 pytest tests; Playwright phone tests `e2e.py`, `e2e_bingo.py`, `e2e_host.py`):
 backend `backend/main.py`, `backend/boards.py`, `backend/test_game.py`; frontend display, team phone, bingo page,
 and the host page (`frontend/src/pages/Host.jsx`: login, start/lobby, buzzers + reopen delay, points, free/remove,
 media from `backend/media/`, bingo panel with apply and reveal, password-confirmed reset). Guide: `guide/GUIDE.md`.
@@ -46,6 +46,13 @@ Server replies: `state` (per-role filtered view), `error{detail}` (sender only),
 Teams are keyed by id (`t1`, `t2`...), not name. Game state is saved to `backend/state.json` (delete it, or use the host Reset, to start fresh).
 Media: files in `backend/media/` are served at `:8000/media/<name>`; the host view lists them as `media_files`,
 grouped by question: `bonus2_1..5` are parts of one question (`question`/`part` fields), `bonus3.png` is its own.
+
+## Party day (non-coders)
+`setup.bat` (once) and `start-party.bat` (each time) in the repo root run `scripts/setup.ps1` / `scripts/start-party.ps1`:
+build the pages, ask the host password, start the server on :8000 (it also serves `frontend/dist`, so the game is ONE
+address), start a Cloudflare quick tunnel (`cloudflared tunnel --url http://localhost:8000`), and open `links.html`
+with QR codes. In the lobby the TV shows a join QR code (`/qr.svg?data=<origin>/team`). Steps: `guide/PARTY-DAY.md`.
+Pages use `location.host` (wss on https) when built, `hostname:8000` in Vite dev (`import.meta.env.DEV`).
 
 ## Commands
 Backend (from `backend/`, virtual env active): `python -m pip install -r requirements.txt`,
