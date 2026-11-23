@@ -67,7 +67,7 @@ All four pages are one React app. `frontend/src/main.jsx` picks the page from th
 |---|---|
 | `backend/main.py` | The whole server: state, message handling, views, timer, saving, media |
 | `backend/boards.py` | The preset bingo cards (edit this with your captains' phrases) |
-| `backend/test_game.py` | 46 pytest tests of the game rules |
+| `backend/test_game.py` | 49 pytest tests of the game rules |
 | `backend/media/` | Images and sounds the host can put on the TV |
 | `frontend/src/useGame.js` | The WebSocket hook every page uses |
 | `frontend/src/pages/*.jsx` | Display, Team, Bingo, Host |
@@ -238,7 +238,7 @@ After a buzz, the buzzers reopen by themselves after `auto_release_seconds` (def
 
 ## 10. Secret bingo scoring
 
-- Cards are preset in `backend/boards.py`: an id, a title and exactly 16 phrases. There are 5 cards, one for each captain: Max, Oto, Pato, Aldape and Gugin. Two squares still say "falta" (Gugin 15 and 16). **Replace those with real phrases before the party.**
+- Cards are preset in `backend/boards.py`: an id, a title and exactly 16 phrases. There are 5 cards, one for each captain: Max, Oto, Pato, Aldape and Gugin. All 16 phrases on every card are real. To change one, edit its text in that file and keep exactly 16 per card.
 - **Shuffled squares.** When the server creates a game, it shuffles each card once (`order` in `new_board`, made by `random.sample`). The player sees the phrases in that order (`board_phrases`), so the cards don't follow the order of the text files. The order is saved in `state.json`, so a refresh, a server restart or a freed card keeps the same layout, and Reset deals new ones. Ticks are stored by square, not by phrase, so lines count on the card exactly as the player sees it. The order never leaves the server except as the player's own phrase list.
 - Bingo works from the start, before any team exists. The team drop-down fills in as captains create teams.
 - The phone only says "square 5 is ticked". The **server counts the lines**: 4 rows, 4 columns and 2 diagonals.
@@ -266,6 +266,8 @@ def count_lines(marks: list) -> int:
 - **Reset:** wipes everything. You type the host password again, and the server checks it.
 
 **Media files.** Drop images (`.png`, `.jpg`, `.gif`, `.webp`) or sounds (`.mp3`, `.wav`, `.ogg`, `.m4a`) into `backend/media/`. The server serves them at `http://<laptop>:8000/media/<name>`, and the host list re-reads the folder on every update, so no restart is needed. Use short names without spaces.
+
+**Questions with several pictures.** Name the files `<question>_<part>`, for example `bonus2_1.webp`, `bonus2_2.webp` and so on. The host page groups them under one heading ("bonus2 · 5 parts") in part order, with a small preview of each and the one on the TV highlighted. A file without a number, such as `bonus3.png`, is a question of its own. The five bonus 2 maps and the bonus 3 swords are already in `backend/media/`. There are no sound files yet: drop `.mp3` or `.wav` files in the same folder and they get a Play button. While a picture is on the TV, it takes about two thirds of the width, the scoreboard switches to compact rows, and the picture is sized to fit under the title, so nothing scrolls on a 720p or 1080p TV.
 
 **The two looks and the reveal.** The TV and the captains' phones start in the **quiz look**: a black halftone stage, tilted sticker cards and marker lettering. The bingo and host pages always use the **reveal look**, a 70s game-show set: a dusty-blue wall with red, orange, yellow and maroon stripes, ring medallions, marquee light bulbs at the sides of big screens, a peach floor, rounded arch-like cards, and a buzzer made of nested rings. At the end of the night, press **Reveal the secret bingo** in the bingo panel. The TV plays a "Plot twist! Let's get ready for a Game Changer!" animation for about 7 seconds, and then the TV and the phones switch to the reveal look, so the whole party ends in the bingo game's look. **Back to the quiz look** undoes it, and Reset also goes back to the quiz look. A good order: Close ticking, Apply bingo bonus, play a sound, then Reveal.
 
@@ -305,7 +307,7 @@ How it works: the server keeps `state["theme"]` (`"quiz"` or `"reveal"`), and on
 
 ## 14. Testing
 
-**Unit tests (pytest), 46 tests.** These test `handle()`, `view_for()` and the timer functions directly with plain dicts, so there's no network and no waiting.
+**Unit tests (pytest), 49 tests.** These test `handle()`, `view_for()` and the timer functions directly with plain dicts, so there's no network and no waiting.
 
 ```powershell
 cd backend
@@ -341,7 +343,7 @@ Delete `backend/state.json` and restart the backend before each script. Each one
 
 **The week before**
 
-- [ ] Replace the "falta" placeholders in `backend/boards.py` (Gugin 2). Each card must keep exactly 16 phrases.
+- [ ] Read the 5 cards in `backend/boards.py` once more for typos. Each card must keep exactly 16 phrases.
 - [ ] Put your images and sounds in `backend/media/`.
 - [ ] Set your own `HOST_PASSWORD`.
 - [ ] Do a dry run on real phones (see below).
@@ -431,7 +433,7 @@ The server stores `release_at` and runs an asyncio task that sleeps until then. 
 Pressing Apply bingo twice gives the same result. The bonus is recalculated from the cards instead of added. Retries and double-clicks become harmless.
 
 **11. How did you test it?**
-46 pytest unit tests call the pure functions (`handle`, `view_for`, `auto_release`) with plain dicts. Passing the time in as an argument means no waiting. Three Playwright scripts drive real browsers at phone size through full games, including the host page and a server restart.
+49 pytest unit tests call the pure functions (`handle`, `view_for`, `auto_release`) with plain dicts. Passing the time in as an argument means no waiting. Three Playwright scripts drive real browsers at phone size through full games, including the host page and a server restart.
 
 **12. What are the limits of this design?**
 State lives in one process's memory, plus a JSON file. It can't run as several server processes, and there's no database or real user accounts. To scale, I'd move the state into Redis or a database with transactions, use pub/sub to tell every server about changes, and add proper authentication.

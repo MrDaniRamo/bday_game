@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useGame } from "../useGame.js";
+import { mediaUrl, useGame } from "../useGame.js";
 import { useCountdown } from "../lib/useCountdown.js";
 import { useTheme } from "../lib/useTheme.js";
 
@@ -233,16 +233,36 @@ function MediaPanel({ state, act }) {
       {state.media_files.length === 0 && (
         <p className="hint">Put images or sounds in backend/media/ and they show up here.</p>
       )}
-      <ul className="files">
-        {state.media_files.map((f) => (
-          <li key={f.name}>
-            <button className="small" onClick={() => show(f.type, f.src)}>
-              {f.type === "image" ? "Show" : "Play"}
-            </button>
-            <span>{f.name}</span>
-          </li>
+      <div className="questions">
+        {groupByQuestion(state.media_files).map(([question, files]) => (
+          <div key={question} className="question">
+            <h3>
+              {question}
+              {/* only numbered files (bonus2_1, bonus2_2...) count as parts */}
+              {files.some((f) => f.part !== null) && <small> · {files.length} parts</small>}
+            </h3>
+            <ul className="files">
+              {files.map((f) => {
+                const onTv = current?.src === f.src;
+                return (
+                  <li key={f.name} className={onTv ? "on-tv" : ""}>
+                    {f.type === "image"
+                      ? <img className="thumb" src={mediaUrl(f.src)} alt="" loading="lazy" />
+                      : <span className="thumb sound" aria-hidden="true">♪</span>}
+                    <span className="file-name">
+                      {f.part !== null ? `Part ${f.part}` : f.name}
+                      {onTv && <strong> · on the TV</strong>}
+                    </span>
+                    <button className="small" onClick={() => show(f.type, f.src)}>
+                      {f.type === "image" ? "Show" : "Play"}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         ))}
-      </ul>
+      </div>
       <form className="row" onSubmit={(e) => {
         e.preventDefault();
         const type = /\.(mp3|wav|ogg|m4a)$/i.test(url) ? "sound" : "image";
@@ -255,6 +275,16 @@ function MediaPanel({ state, act }) {
       </form>
     </section>
   );
+}
+
+// [["bonus2", [part 1, part 2, ...]], ["bonus3", [file]], ...] in the server's order.
+function groupByQuestion(files) {
+  const groups = new Map();
+  for (const f of files) {
+    if (!groups.has(f.question)) groups.set(f.question, []);
+    groups.get(f.question).push(f);
+  }
+  return [...groups.entries()];
 }
 
 function BingoPanel({ state, act }) {
