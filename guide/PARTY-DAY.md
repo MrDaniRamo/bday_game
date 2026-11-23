@@ -82,6 +82,8 @@ The folder should contain `setup.bat` and `start-party.bat`.
 
 **The link changes every time you run `start-party.bat`.** Old links stop working, so share fresh ones each time. On the party day, start it once and leave it running.
 
+**The secret bingo link:** in the black window it's the line `Secret bingo : https://….trycloudflare.com/bingo`, and it's on the links page under "Secret bingo". All 5 bingo players get the same link, and each one taps the card with their captain's name. Send it only after you start the game for real, because a link from a test run stops working.
+
 ### B3. During the party
 
 Everything is on your host page:
@@ -118,7 +120,7 @@ Click the black window and press **Enter**. The scores are saved, so if you need
 | "The game is not set up yet" | Run `setup.bat` first (Part A). |
 | "The game server did not start" | Close everything and try again. If it still fails, open the `logs` folder and send me `server.log`. |
 | "Could not open the public link" | The laptop may be offline. Check the internet and run `start-party.bat` again. Or use the **Wi-Fi backup** shown in the window: phones join the laptop's Wi-Fi and open that address. |
-| The link stopped working during the party | The laptop probably slept, lost internet, or the black window was closed. Run `start-party.bat` again, press **Enter** to **continue the saved game**, and share the new links. Everyone's team and score come back. |
+| The link stopped working during the party | The laptop probably slept, lost internet, or the black window was closed. Run `start-party.bat` again and press **Enter** to **continue the saved game**. Teams, scores and bingo ticks all come back, but the link is new and phones forget which team or card was theirs. Send everyone the new links. On the host page, press **Free** on each team and each bingo card. Captains then tap their team name to take it back, and bingo players pick their card again. |
 | Captains say the page says "Connecting…" | Ask them to refresh. If it continues, check the black window is still open. |
 | No sound on the TV | Click **"Click to enable sound"** on the TV page. |
 | I forgot the host password | Stop the game (Enter in the black window), start it again, choose a new password, and choose to **continue the saved game**. |
