@@ -21,6 +21,22 @@ function Stop-WithProblem($text) {
 }
 function Test-Command($name) { [bool](Get-Command $name -ErrorAction SilentlyContinue) }
 
+# True if something accepts connections on 127.0.0.1:8000 (the game server).
+# We use the number 127.0.0.1, not the name "localhost": on many Windows laptops
+# "localhost" means the IPv6 address first, and the server listens on IPv4.
+# A plain connection also ignores any proxy settings that could get in the way.
+function Test-Server {
+    $client = New-Object System.Net.Sockets.TcpClient
+    try {
+        $attempt = $client.BeginConnect("127.0.0.1", 8000, $null, $null)
+        return ($attempt.AsyncWaitHandle.WaitOne(1000) -and $client.Connected)
+    } catch {
+        return $false
+    } finally {
+        $client.Close()
+    }
+}
+
 # Stops anything left over from an earlier run (for example if this window was
 # closed with the X instead of pressing Enter): an old game server or tunnel.
 function Stop-Leftovers {
@@ -82,14 +98,17 @@ $server = Start-Process -FilePath $venvPython `
     -RedirectStandardOutput "logs\server-out.log" -RedirectStandardError "logs\server.log"
 
 $up = $false
-for ($i = 0; $i -lt 30 -and -not $up; $i++) {
+for ($i = 0; $i -lt 45 -and -not $up; $i++) {
     Start-Sleep -Seconds 1
-    try { $up = (Invoke-WebRequest "http://localhost:8000/health" -UseBasicParsing -TimeoutSec 2).StatusCode -eq 200 } catch { }
     if ($server.HasExited) { break }
+    $up = Test-Server
+}
+if ($server.HasExited) {
+    Stop-WithProblem "The game server stopped by itself. The details are in logs\server.log."
 }
 if (-not $up) {
     Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
-    Stop-WithProblem "The game server did not start. The details are in logs\server.log."
+    Stop-WithProblem "The game server started but this script could not reach it on 127.0.0.1:8000. The details are in logs\server.log."
 }
 Say "Game server is running." Green
 Say "(If Windows asks whether to allow Python on networks, click Allow. It is only needed for the Wi-Fi backup.)"
@@ -102,7 +121,7 @@ if ($haveTunnel) {
     Say "Opening the public link (this takes a few seconds)..."
     Remove-Item "logs\tunnel.log" -ErrorAction SilentlyContinue
     $tunnel = Start-Process -FilePath "cloudflared" `
-        -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://localhost:8000" `
+        -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:8000" `
         -WindowStyle Hidden -PassThru `
         -RedirectStandardOutput "logs\tunnel-out.log" -RedirectStandardError "logs\tunnel.log"
     for ($i = 0; $i -lt 60 -and -not $publicUrl; $i++) {
@@ -123,7 +142,7 @@ if ($haveTunnel) {
 
 $wifi = Get-WifiAddress
 $wifiUrl = if ($wifi) { "http://${wifi}:8000" } else { $null }
-$base = if ($publicUrl) { $publicUrl } elseif ($wifiUrl) { $wifiUrl } else { "http://localhost:8000" }
+$base = if ($publicUrl) { $publicUrl } elseif ($wifiUrl) { $wifiUrl } else { "http://127.0.0.1:8000" }
 
 # ------------------------------------------------------------ links page ---
 # links.html: every link with a QR code, for the host to scan with their phone.
