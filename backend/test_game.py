@@ -519,3 +519,43 @@ def test_the_trivia_images_are_in_the_media_folder():
         match = [m for m in by_name.values() if m["question"] == "bonus2" and m["part"] == part]
         assert len(match) == 1 and match[0]["type"] == "image"
     assert by_name["bonus3.png"]["question"] == "bonus3"
+
+
+# ---------- one address: the server serves the built pages and QR codes ----------
+def test_built_pages_are_served_and_unknown_paths_get_index(tmp_path):
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from main import serve_frontend
+    (tmp_path / "assets").mkdir()
+    (tmp_path / "index.html").write_text("<html>game</html>")
+    (tmp_path / "assets" / "app.js").write_text("console.log(1)")
+    (tmp_path.parent / "secret.txt").write_text("outside dist")
+    app = FastAPI()
+    assert serve_frontend(app, tmp_path) is True
+    client = TestClient(app)
+    for page in ("/", "/team", "/host", "/bingo"):      # React picks the page
+        assert client.get(page).text == "<html>game</html>"
+    assert client.get("/assets/app.js").text == "console.log(1)"
+    assert "outside dist" not in client.get("/../secret.txt").text   # no escaping dist
+
+
+def test_nothing_is_served_before_the_pages_are_built(tmp_path):
+    from fastapi import FastAPI
+    from main import serve_frontend
+    assert serve_frontend(FastAPI(), tmp_path) is False
+
+
+def test_qr_code_is_an_svg_and_checks_its_input():
+    from fastapi.testclient import TestClient
+    from main import app
+    client = TestClient(app)
+    ok = client.get("/qr.svg", params={"data": "https://example.trycloudflare.com/team"})
+    assert ok.status_code == 200 and ok.headers["content-type"].startswith("image/svg+xml")
+    assert "<svg" in ok.text
+    assert client.get("/qr.svg", params={"data": "x" * 301}).status_code == 400
+
+
+def test_health_check():
+    from fastapi.testclient import TestClient
+    from main import app
+    assert TestClient(app).get("/health").json()["status"] == "ok"

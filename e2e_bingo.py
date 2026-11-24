@@ -1,7 +1,7 @@
 import json, os, time
 from playwright.sync_api import sync_playwright
 from websockets.sync.client import connect
-URL = "http://localhost:5173"
+URL = os.environ.get("GAME_URL", "http://localhost:5173")  # built pages: http://localhost:8000
 PHONE = {"viewport": {"width": 390, "height": 760}, "device_scale_factor": 1, "is_mobile": True, "has_touch": True}
 class Host:
     def __init__(s):

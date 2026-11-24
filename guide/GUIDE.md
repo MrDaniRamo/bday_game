@@ -67,7 +67,7 @@ All four pages are one React app. `frontend/src/main.jsx` picks the page from th
 |---|---|
 | `backend/main.py` | The whole server: state, message handling, views, timer, saving, media |
 | `backend/boards.py` | The preset bingo cards (edit this with your captains' phrases) |
-| `backend/test_game.py` | 49 pytest tests of the game rules |
+| `backend/test_game.py` | 53 pytest tests of the game rules and the server |
 | `backend/media/` | Images and sounds the host can put on the TV |
 | `frontend/src/useGame.js` | The WebSocket hook every page uses |
 | `frontend/src/pages/*.jsx` | Display, Team, Bingo, Host |
@@ -78,6 +78,14 @@ All four pages are one React app. `frontend/src/main.jsx` picks the page from th
 ---
 
 ## 3. Running it on Windows
+
+> **For the party itself**, use the double-click scripts instead: see [`PARTY-DAY.md`](PARTY-DAY.md). The commands below are the developer way, with two servers and live reloading.
+
+**Two ways to run it**
+
+- **Development:** Vite serves the pages on port 5173 and reloads them as you edit. The game server runs on port 8000. In this mode the pages connect to port 8000 on the same machine.
+- **Built (party):** run `npm run build` once. The game server then also serves the finished pages from `frontend/dist`, so the whole game lives at **one address**: `http://localhost:8000`, the laptop's Wi-Fi address on port 8000, or a tunnel link. The pages connect back to whatever address they were opened from, over `wss://` when the address is `https://`. One address is what makes a Cloudflare tunnel possible. It also means only port 8000 has to be allowed through the firewall.
+- **Join code:** in the lobby, the TV shows a "scan to join" QR code made from the address the TV was opened with (`/qr.svg?data=...`).
 
 Run these in PowerShell from the project folder.
 
@@ -307,7 +315,7 @@ How it works: the server keeps `state["theme"]` (`"quiz"` or `"reveal"`), and on
 
 ## 14. Testing
 
-**Unit tests (pytest), 49 tests.** These test `handle()`, `view_for()` and the timer functions directly with plain dicts, so there's no network and no waiting.
+**Unit tests (pytest), 53 tests.** These test `handle()`, `view_for()` and the timer functions directly with plain dicts, so there's no network and no waiting.
 
 ```powershell
 cd backend
@@ -354,8 +362,8 @@ Delete `backend/state.json` and restart the backend before each script. Each one
 - [ ] Windows: set the Wi-Fi network to **Private**.
 - [ ] Allow ports **5173** and **8000** through the Windows firewall, or accept the prompt the first time.
 - [ ] Find the laptop IP with `ipconfig` (IPv4 Address, for example `192.168.1.23`).
-- [ ] Make a QR for the team page: `python tools/make_qr.py http://192.168.1.23:5173/team` (needs `pip install qrcode[pil]`).
-- [ ] Send the bingo link (`http://192.168.1.23:5173/bingo`) **privately** to each bingo player. Never show it on the TV.
+- [ ] Easiest: use `start-party.bat` (see [`PARTY-DAY.md`](PARTY-DAY.md)). It makes a public link and QR codes, and the TV shows a join code, so the network steps above are only a backup.
+- [ ] Send the bingo link **privately** to each bingo player. Never show it on the TV.
 
 **On the night**
 
@@ -433,7 +441,7 @@ The server stores `release_at` and runs an asyncio task that sleeps until then. 
 Pressing Apply bingo twice gives the same result. The bonus is recalculated from the cards instead of added. Retries and double-clicks become harmless.
 
 **11. How did you test it?**
-49 pytest unit tests call the pure functions (`handle`, `view_for`, `auto_release`) with plain dicts. Passing the time in as an argument means no waiting. Three Playwright scripts drive real browsers at phone size through full games, including the host page and a server restart.
+53 pytest unit tests call the pure functions (`handle`, `view_for`, `auto_release`) with plain dicts. Passing the time in as an argument means no waiting. Three Playwright scripts drive real browsers at phone size through full games, including the host page and a server restart.
 
 **12. What are the limits of this design?**
 State lives in one process's memory, plus a JSON file. It can't run as several server processes, and there's no database or real user accounts. To scale, I'd move the state into Redis or a database with transactions, use pub/sub to tell every server about changes, and add proper authentication.

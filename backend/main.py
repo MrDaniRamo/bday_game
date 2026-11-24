@@ -19,8 +19,11 @@ import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+import qrcode
+import qrcode.image.svg
+from fastapi import FastAPI, HTTPException, Response, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from boards import BOARDS
@@ -149,11 +152,25 @@ def new_state() -> dict:
 state = new_state()  # the single global game state, shared by all clients
 
 
-# ------------------------------------------------------------- HTTP route ---
-@app.get("/")
-async def read_root():
+# ------------------------------------------------------------ HTTP routes ---
+@app.get("/health")
+async def health():
     """Health check: lets you confirm the server is up from a browser."""
-    return {"status": "ok", "game": "Birthday Trivia", "version": "3.0.0"}
+    return {"status": "ok", "game": "Birthday Trivia", "version": "3.1.0"}
+
+
+@app.get("/qr.svg")
+async def qr_svg(data: str):
+    """A QR code (SVG image) for a short text, e.g. the team page's address.
+
+    The TV asks for the address it was opened with, so the code works for
+    whatever link people are using: a tunnel, the laptop's Wi-Fi address...
+    """
+    if not 0 < len(data) <= 300:
+        raise HTTPException(status_code=400, detail="data must be 1-300 characters")
+    image = qrcode.make(data, image_factory=qrcode.image.svg.SvgPathImage, border=2)
+    return Response(image.to_string(encoding="unicode"), media_type="image/svg+xml",
+                    headers={"Cache-Control": "max-age=3600"})
 
 
 # ------------------------------------------------------ sending helpers ---
@@ -629,3 +646,37 @@ def load_state() -> None:
         log.warning("state.json is invalid; starting with a fresh state")
 
 load_state()  # load the state from disk when the server starts
+
+
+# --------------------------------------------- the React pages, one address ---
+# After `npm run build`, frontend/dist holds the finished pages. Serving them from
+# this same server means the whole game lives at ONE address (port 8000), which
+# is what a tunnel like Cloudflare's needs. In development, Vite (port 5173)
+# serves the pages instead and this folder does not have to exist.
+FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
+
+
+def serve_frontend(app: FastAPI, dist: Path) -> bool:
+    """Serve the built pages: real files as they are, any other path gets index.html.
+
+    Must run AFTER every other route, because the catch-all would hide them.
+    Returns False (and serves nothing) if the pages have not been built.
+    """
+    index = dist / "index.html"
+    if not index.is_file():
+        return False
+    dist = dist.resolve()
+
+    @app.get("/{path:path}", include_in_schema=False)
+    async def page(path: str):
+        file = (dist / path).resolve()
+        # a real file inside dist (scripts, styles, icons); never outside it
+        if path and file.is_file() and file.is_relative_to(dist):
+            return FileResponse(file)
+        return FileResponse(index)          # /, /team, /host, /bingo: React picks the page
+
+    return True
+
+
+if serve_frontend(app, FRONTEND_DIST):
+    log.info("Serving the built pages from %s", FRONTEND_DIST)

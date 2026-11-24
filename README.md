@@ -9,7 +9,11 @@ A party trivia game: a TV scoreboard, a buzzer on each team captain's phone, a s
 | `/bingo` | Secret players' phones | 4x4 card of the captain's habits; lines become bonus points |
 | `/host` | Host (password) | Run the whole game |
 
-## Quick start (Windows PowerShell)
+## For the party (no coding needed)
+
+Double-click **`setup.bat`** once, then **`start-party.bat`** each time you play. It starts the game, opens a free public link, and shows QR codes for every page. Step-by-step instructions: [`guide/PARTY-DAY.md`](guide/PARTY-DAY.md).
+
+## Quick start for development (Windows PowerShell)
 
 ```powershell
 cd backend
@@ -31,5 +35,6 @@ Open http://localhost:5173/ for the TV and http://localhost:5173/host for the ho
 
 ## Learn more
 
+- [`guide/PARTY-DAY.md`](guide/PARTY-DAY.md): running the party from a laptop with a public link, for non-coders.
 - [`guide/GUIDE.md`](guide/GUIDE.md): how everything works, testing, a party-day checklist, troubleshooting and interview questions.
 - [`CLAUDE.md`](CLAUDE.md): the project brief and message protocol.

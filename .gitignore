@@ -28,3 +28,7 @@ team-qr.png
 .idea/
 .DS_Store
 Thumbs.db
+
+# Made by start-party on the laptop
+logs/
+links.html
